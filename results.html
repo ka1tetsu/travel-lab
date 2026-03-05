@@ -4,11 +4,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>検索結果 | トラベル・ラボ</title>
-    <meta name="description" content="ホテルの最安値比較結果。楽天・じゃらん・Yahoo!・Booking.comを横断比較して最安値を表示しています。">
+    <title>ホテル検索結果 | 最安値の一括比較 - トラベル・ラボ</title>
+    <meta name="description" content="旅行先のホテル最安値比較結果。楽天トラベル・じゃらん・Yahoo!・Booking.comを横断検索・比較して、最もお得な宿泊プランを表示しています。">
+    <!-- OGP -->
+    <meta property="og:title" content="検索結果 | 最安値ホテルの一括比較 - トラベル・ラボ">
+    <meta property="og:description" content="楽天・じゃらん・Yahoo!・Booking.comの宿泊料金を一斉に比較。最安値のホテルがすぐに見つかる！">
+    <meta property="og:type" content="website">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="css/style.css" as="style">
     <link rel="stylesheet" href="css/style.css">
+
+    <!-- JSON-LD Breadcrumb -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "name": "ホーム",
+        "item": "https://travellab.example.com/"
+      },{
+        "@type": "ListItem",
+        "position": 2,
+        "name": "ホテル検索結果"
+      }]
+    }
+    </script>
+
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4868615559787524"
+        crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -23,8 +51,8 @@
             <nav class="nav-links" aria-label="メインナビゲーション">
                 <a href="index.html">ホーム</a>
                 <a href="#">ホテル比較</a>
-                <a href="#">航空券</a>
-                <a href="#">新幹線</a>
+                <a href="flights.html">航空券</a>
+                <a href="shinkansen.html">新幹線</a>
                 <a href="index.html" class="nav-cta">新しい検索</a>
             </nav>
             <button class="mobile-menu-btn" aria-label="メニュー">☰</button>
@@ -40,7 +68,7 @@
     </div>
 
     <!-- ── RESULTS LAYOUT ── -->
-    <div class="results-layout" role="main">
+    <main class="results-layout">
 
         <!-- ── Filter Sidebar ── -->
         <aside class="filter-sidebar" aria-label="絞り込み条件">
@@ -123,12 +151,17 @@
             <!-- Loading state -->
             <div id="loading-overlay" role="status" aria-label="検索中" aria-live="polite">
                 <div class="loading-spinner" aria-hidden="true"></div>
-                <p class="loading-text">4つのサイトを同時に比較中...</p>
-                <div class="loading-sites" aria-hidden="true">
+                <p class="loading-text">8つのサイトを同時に比較中...</p>
+                <div class="loading-sites" aria-hidden="true"
+                    style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px;">
                     <span class="loading-site ls-rakuten">楽天トラベル</span>
                     <span class="loading-site ls-jalan">じゃらん</span>
-                    <span class="loading-site ls-yahoo">Yahoo!トラベル</span>
+                    <span class="loading-site ls-yahoo">Yahoo!</span>
                     <span class="loading-site ls-booking">Booking.com</span>
+                    <span class="loading-site ls-expedia">Expedia</span>
+                    <span class="loading-site ls-agoda">Agoda</span>
+                    <span class="loading-site ls-jtb">JTB</span>
+                    <span class="loading-site ls-rurubu">るるぶ</span>
                 </div>
             </div>
 
@@ -136,7 +169,7 @@
             <div id="hotel-list" aria-label="ホテル一覧" style="display:none;"></div>
 
         </section>
-    </div>
+    </main>
 
     <!-- ── FOOTER ── -->
     <footer class="site-footer" aria-label="フッター">
@@ -152,25 +185,25 @@
                 <div class="footer-col">
                     <h4>サービス</h4>
                     <nav class="footer-links">
-                        <a href="#">国内ホテル比較</a>
-                        <a href="#">海外ホテル比較</a>
-                        <a href="#">航空券比較（準備中）</a>
+                        <a href="domestic-hotels.html">国内ホテル比較</a>
+                        <a href="overseas-hotels.html">海外ホテル比較</a>
+                        <a href="flights.html">航空券比較（準備中）</a>
                     </nav>
                 </div>
                 <div class="footer-col">
                     <h4>サポート</h4>
                     <nav class="footer-links">
-                        <a href="#">使い方ガイド</a>
-                        <a href="#">よくある質問</a>
-                        <a href="#">お問い合わせ</a>
+                        <a href="guide.html">使い方ガイド</a>
+                        <a href="faq.html">よくある質問</a>
+                        <a href="contact.html">お問い合わせ</a>
                     </nav>
                 </div>
                 <div class="footer-col">
                     <h4>法的情報</h4>
                     <nav class="footer-links">
-                        <a href="#">利用規約</a>
-                        <a href="#">プライバシーポリシー</a>
-                        <a href="#">免責事項</a>
+                        <a href="terms.html">利用規約</a>
+                        <a href="privacy.html">プライバシーポリシー</a>
+                        <a href="disclaimer.html">免責事項</a>
                     </nav>
                 </div>
             </div>
@@ -184,6 +217,7 @@
     </footer>
 
     <script src="js/data.js"></script>
+    <script src="js/api.js"></script>
     <script src="js/results.js"></script>
 </body>
 

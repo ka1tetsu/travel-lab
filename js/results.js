@@ -6,137 +6,153 @@ let currentHotels = [];
 let favorites = JSON.parse(localStorage.getItem("tl_favorites") || "[]");
 
 document.addEventListener("DOMContentLoaded", () => {
-    const params = new URLSearchParams(window.location.search);
-    const query = params.get("q") || "";
-    const checkin = params.get("checkin") || "";
-    const checkout = params.get("checkout") || "";
-    const adults = parseInt(params.get("adults") || "2");
-    const children = parseInt(params.get("children") || "0");
-    const rooms = parseInt(params.get("rooms") || "1");
+  const params = new URLSearchParams(window.location.search);
+  const query = params.get("q") || "";
+  const checkin = params.get("checkin") || "";
+  const checkout = params.get("checkout") || "";
+  const adults = parseInt(params.get("adults") || "2");
+  const children = parseInt(params.get("children") || "0");
+  const rooms = parseInt(params.get("rooms") || "1");
 
-    // Display search summary
-    renderSearchSummary({ query, checkin, checkout, adults, children, rooms });
+  // Display search summary
+  renderSearchSummary({ query, checkin, checkout, adults, children, rooms });
 
-    // Run "search" with loading simulation
-    showLoading();
-    setTimeout(() => {
+  showLoading();
+  (async () => {
+    try {
+      // 楽天APIからホテル情報を非同期取得
+      const apiData = await fetchRakutenHotels(query);
+
+      if (apiData && apiData.length > 0) {
+        // 取得したデータをフロントの表示フォーマットにマッピング（実際のホテル画像等を含む）
+        currentHotels = mapRakutenToTravelLab(apiData, query, { checkin, checkout, adults, rooms });
+      } else {
+        // API結果が0件、もしくはエラーの場合はローカルのモックデータへフォールバック
+        console.warn("APIからデータが取得できませんでした。モックデータにフォールバックします。");
         currentHotels = filterHotelsByQuery(query);
-        hideLoading();
-        renderResults(currentHotels, { checkin, checkout, adults, rooms });
-        updateCount(currentHotels.length);
-    }, 2000);
-
-    // Sort buttons
-    document.querySelectorAll(".sort-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-            document.querySelectorAll(".sort-btn").forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-            sortAndRender(btn.dataset.sort, { checkin, checkout, adults, rooms });
-        });
-    });
-
-    // Filters
-    document.getElementById("apply-filters")?.addEventListener("click", () => {
-        applyFilters({ checkin, checkout, adults, rooms });
-    });
-    document.getElementById("reset-filters")?.addEventListener("click", () => {
-        resetFilters({ checkin, checkout, adults, rooms });
-    });
-
-    // Price range slider
-    const slider = document.getElementById("price-max");
-    const sliderVal = document.getElementById("price-max-val");
-    if (slider && sliderVal) {
-        slider.addEventListener("input", () => {
-            sliderVal.textContent = Number(slider.value).toLocaleString();
-        });
+      }
+    } catch (error) {
+      console.error("API検索中にエラーが発生しました:", error);
+      currentHotels = filterHotelsByQuery(query);
     }
+
+    hideLoading();
+    renderResults(currentHotels, { checkin, checkout, adults, rooms });
+    updateCount(currentHotels.length);
+  })();
+
+  // Sort buttons
+  document.querySelectorAll(".sort-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".sort-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      sortAndRender(btn.dataset.sort, { checkin, checkout, adults, rooms });
+    });
+  });
+
+  // Filters
+  document.getElementById("apply-filters")?.addEventListener("click", () => {
+    applyFilters({ checkin, checkout, adults, rooms });
+  });
+  document.getElementById("reset-filters")?.addEventListener("click", () => {
+    resetFilters({ checkin, checkout, adults, rooms });
+  });
+
+  // Price range slider
+  const slider = document.getElementById("price-max");
+  const sliderVal = document.getElementById("price-max-val");
+  if (slider && sliderVal) {
+    slider.addEventListener("input", () => {
+      sliderVal.textContent = Number(slider.value).toLocaleString();
+    });
+  }
 });
 
 function filterHotelsByQuery(query) {
-    if (!query) return HOTELS;
-    const q = query.toLowerCase();
-    return HOTELS.filter(h =>
-        h.area.includes(query) ||
-        h.name.toLowerCase().includes(q) ||
-        h.address.includes(query) ||
-        h.category.includes(query)
-    );
+  if (!query) return HOTELS;
+  const q = query.toLowerCase();
+  return HOTELS.filter(h =>
+    h.area.includes(query) ||
+    h.name.toLowerCase().includes(q) ||
+    h.address.includes(query) ||
+    h.category.includes(query)
+  );
 }
 
 function sortHotels(hotels, sortKey) {
-    const sorted = [...hotels];
-    if (sortKey === "price-asc") {
-        sorted.sort((a, b) => getMinPrice(a) - getMinPrice(b));
-    } else if (sortKey === "price-desc") {
-        sorted.sort((a, b) => getMinPrice(b) - getMinPrice(a));
-    } else if (sortKey === "rating") {
-        sorted.sort((a, b) => b.rating - a.rating);
-    } else if (sortKey === "reviews") {
-        sorted.sort((a, b) => b.reviewCount - a.reviewCount);
-    }
-    return sorted;
+  const sorted = [...hotels];
+  if (sortKey === "price-asc") {
+    sorted.sort((a, b) => getMinPrice(a) - getMinPrice(b));
+  } else if (sortKey === "price-desc") {
+    sorted.sort((a, b) => getMinPrice(b) - getMinPrice(a));
+  } else if (sortKey === "rating") {
+    sorted.sort((a, b) => b.rating - a.rating);
+  } else if (sortKey === "reviews") {
+    sorted.sort((a, b) => b.reviewCount - a.reviewCount);
+  }
+  return sorted;
 }
 
 function sortAndRender(sortKey, opts) {
-    const filtered = applyCurrentFilters(currentHotels);
-    const sorted = sortHotels(filtered, sortKey);
-    const list = document.getElementById("hotel-list");
-    if (list) list.innerHTML = sorted.map(h => buildHotelCard(h, opts)).join("");
-    attachCardEvents();
-    updateCount(sorted.length);
+  const filtered = applyCurrentFilters(currentHotels);
+  const sorted = sortHotels(filtered, sortKey);
+  const list = document.getElementById("hotel-list");
+  if (list) list.innerHTML = sorted.map(h => buildHotelCard(h, opts)).join("");
+  attachCardEvents();
+  updateCount(sorted.length);
 }
 
 function applyFilters(opts) {
-    const filtered = applyCurrentFilters(currentHotels);
-    const sortKey = document.querySelector(".sort-btn.active")?.dataset.sort || "price-asc";
-    const sorted = sortHotels(filtered, sortKey);
-    const list = document.getElementById("hotel-list");
-    if (list) list.innerHTML = sorted.map(h => buildHotelCard(h, opts)).join("");
-    attachCardEvents();
-    updateCount(sorted.length);
+  const filtered = applyCurrentFilters(currentHotels);
+  const sortKey = document.querySelector(".sort-btn.active")?.dataset.sort || "price-asc";
+  const sorted = sortHotels(filtered, sortKey);
+  const list = document.getElementById("hotel-list");
+  if (list) list.innerHTML = sorted.map(h => buildHotelCard(h, opts)).join("");
+  attachCardEvents();
+  updateCount(sorted.length);
 }
 
 function applyCurrentFilters(hotels) {
-    const maxPrice = parseInt(document.getElementById("price-max")?.value || "999999");
-    const meal = document.querySelector(".meal-btn.active")?.dataset.meal || "all";
-    const amenities = Array.from(document.querySelectorAll(".amenity-check:checked")).map(c => c.value);
+  const maxPrice = parseInt(document.getElementById("price-max")?.value || "999999");
+  const meal = document.querySelector(".meal-btn.active")?.dataset.meal || "all";
+  const amenities = Array.from(document.querySelectorAll(".amenity-check:checked")).map(c => c.value);
 
-    return hotels.filter(h => {
-        const minP = getMinPrice(h);
-        if (minP > maxPrice) return false;
-        if (meal !== "all") {
-            const hasMeal = Object.values(h.prices).some(p => p.price !== null && p.mealPlan === meal);
-            if (!hasMeal) return false;
-        }
-        if (amenities.length > 0) {
-            const hasAll = amenities.every(a => h.amenities.includes(a));
-            if (!hasAll) return false;
-        }
-        return true;
-    });
+  return hotels.filter(h => {
+    const minP = getMinPrice(h);
+    if (minP > maxPrice) return false;
+    if (meal !== "all") {
+      const hasMeal = Object.values(h.prices).some(p => p.price !== null && p.mealPlan === meal);
+      if (!hasMeal) return false;
+    }
+    if (amenities.length > 0) {
+      const hasAll = amenities.every(a => h.amenities.includes(a));
+      if (!hasAll) return false;
+    }
+    return true;
+  });
 }
 
 function resetFilters(opts) {
-    const slider = document.getElementById("price-max");
-    const sliderVal = document.getElementById("price-max-val");
-    if (slider) slider.value = slider.max;
-    if (sliderVal) sliderVal.textContent = Number(slider?.max || 99999).toLocaleString();
-    document.querySelectorAll(".meal-btn").forEach(b => b.classList.remove("active"));
-    document.querySelector(".meal-btn[data-meal='all']")?.classList.add("active");
-    document.querySelectorAll(".amenity-check").forEach(c => (c.checked = false));
-    renderResults(currentHotels, opts);
-    updateCount(currentHotels.length);
+  const slider = document.getElementById("price-max");
+  const sliderVal = document.getElementById("price-max-val");
+  if (slider) slider.value = slider.max;
+  if (sliderVal) sliderVal.textContent = Number(slider?.max || 99999).toLocaleString();
+  document.querySelectorAll(".meal-btn").forEach(b => b.classList.remove("active"));
+  document.querySelector(".meal-btn[data-meal='all']")?.classList.add("active");
+  document.querySelectorAll(".amenity-check").forEach(c => (c.checked = false));
+  renderResults(currentHotels, opts);
+  updateCount(currentHotels.length);
 }
 
 function renderSearchSummary({ query, checkin, checkout, adults, children, rooms }) {
-    const el = document.getElementById("search-summary");
-    if (!el) return;
-    const ci = checkin ? formatJpDate(checkin) : "—";
-    const co = checkout ? formatJpDate(checkout) : "—";
-    const nights = checkin && checkout ? calcNights(checkin, checkout) : 1;
-    el.innerHTML = `
-    <span class="summary-item"><span class="summary-icon">📍</span><strong>${query || "全エリア"}</strong></span>
+  const el = document.getElementById("search-summary");
+  if (!el) return;
+  const ci = checkin ? formatJpDate(checkin) : "—";
+  const co = checkout ? formatJpDate(checkout) : "—";
+  const nights = checkin && checkout ? calcNights(checkin, checkout) : 1;
+  const displayQuery = query.includes(",") ? "現在地周辺" : (query || "全エリア");
+  el.innerHTML = `
+    <span class="summary-item"><span class="summary-icon">📍</span><strong>${displayQuery}</strong></span>
     <span class="summary-sep">|</span>
     <span class="summary-item"><span class="summary-icon">📅</span>${ci} <span class="night-badge">${nights}泊</span> ${co}</span>
     <span class="summary-sep">|</span>
@@ -145,41 +161,41 @@ function renderSearchSummary({ query, checkin, checkout, adults, children, rooms
 }
 
 function renderResults(hotels, opts) {
-    const sorted = sortHotels(hotels, "price-asc");
-    const list = document.getElementById("hotel-list");
-    if (!list) return;
-    if (sorted.length === 0) {
-        list.innerHTML = `<div class="no-results">
+  const sorted = sortHotels(hotels, "price-asc");
+  const list = document.getElementById("hotel-list");
+  if (!list) return;
+  if (sorted.length === 0) {
+    list.innerHTML = `<div class="no-results">
       <div class="no-results-icon">🔍</div>
       <h3>該当するホテルが見つかりませんでした</h3>
       <p>条件を変更して再度お試しください</p>
     </div>`;
-        return;
-    }
-    list.innerHTML = sorted.map(h => buildHotelCard(h, opts)).join("");
-    attachCardEvents();
+    return;
+  }
+  list.innerHTML = sorted.map(h => buildHotelCard(h, opts)).join("");
+  attachCardEvents();
 }
 
 function buildHotelCard(hotel, { checkin, checkout, adults, rooms } = {}) {
-    const minPrice = getMinPrice(hotel);
-    const cheapSite = getCheapestSite(hotel);
-    const nights = checkin && checkout ? calcNights(checkin, checkout) : 1;
-    const isFav = favorites.includes(hotel.id);
-    const stars = "★".repeat(hotel.stars) + "☆".repeat(5 - hotel.stars);
+  const minPrice = getMinPrice(hotel);
+  const cheapSite = getCheapestSite(hotel);
+  const nights = checkin && checkout ? calcNights(checkin, checkout) : 1;
+  const isFav = favorites.includes(hotel.id);
+  const stars = "★".repeat(hotel.stars) + "☆".repeat(5 - hotel.stars);
 
-    const priceRows = Object.entries(hotel.prices).map(([site, data]) => {
-        const cfg = SITE_CONFIG[site];
-        if (!data.price) {
-            return `<div class="price-row price-na">
+  const priceRows = Object.entries(hotel.prices).map(([site, data]) => {
+    const cfg = SITE_CONFIG[site];
+    if (!data.price) {
+      return `<div class="price-row price-na">
         <div class="site-label" style="color:${cfg.color}">
           <span class="site-dot" style="background:${cfg.color}"></span>${cfg.name}
         </div>
         <div class="price-unavailable">取扱なし</div>
       </div>`;
-        }
-        const isCheap = site === cheapSite;
-        const totalPrice = data.price * nights * rooms;
-        return `<div class="price-row ${isCheap ? "cheapest" : ""}">
+    }
+    const isCheap = site === cheapSite;
+    const totalPrice = data.price * nights * rooms;
+    return `<div class="price-row ${isCheap ? "cheapest" : ""}">
       <div class="site-label" style="color:${cfg.color}">
         <span class="site-dot" style="background:${cfg.color}"></span>${cfg.name}
         ${isCheap ? '<span class="cheapest-badge">最安値</span>' : ""}
@@ -196,14 +212,14 @@ function buildHotelCard(hotel, { checkin, checkout, adults, rooms } = {}) {
         予約する
       </a>
     </div>`;
-    }).join("");
+  }).join("");
 
-    const amenityTags = hotel.amenities.map(a => {
-        const info = AMENITY_ICONS[a] || { icon: "✓", label: a };
-        return `<span class="amenity-tag"><span>${info.icon}</span>${info.label}</span>`;
-    }).join("");
+  const amenityTags = hotel.amenities.map(a => {
+    const info = AMENITY_ICONS[a] || { icon: "✓", label: a };
+    return `<span class="amenity-tag"><span>${info.icon}</span>${info.label}</span>`;
+  }).join("");
 
-    return `
+  return `
   <article class="hotel-card" data-id="${hotel.id}">
     <div class="hotel-card-inner">
       <div class="hotel-image-wrap">
@@ -250,72 +266,72 @@ function buildHotelCard(hotel, { checkin, checkout, adults, rooms } = {}) {
 }
 
 function attachCardEvents() {
-    // Favorite buttons
-    document.querySelectorAll(".fav-btn").forEach(btn => {
-        btn.addEventListener("click", (e) => {
-            e.preventDefault();
-            const id = parseInt(btn.dataset.id);
-            if (favorites.includes(id)) {
-                favorites = favorites.filter(f => f !== id);
-                btn.textContent = "♡";
-                btn.classList.remove("fav-active");
-            } else {
-                favorites.push(id);
-                btn.textContent = "♥";
-                btn.classList.add("fav-active");
-            }
-            localStorage.setItem("tl_favorites", JSON.stringify(favorites));
-        });
+  // Favorite buttons
+  document.querySelectorAll(".fav-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const id = parseInt(btn.dataset.id);
+      if (favorites.includes(id)) {
+        favorites = favorites.filter(f => f !== id);
+        btn.textContent = "♡";
+        btn.classList.remove("fav-active");
+      } else {
+        favorites.push(id);
+        btn.textContent = "♥";
+        btn.classList.add("fav-active");
+      }
+      localStorage.setItem("tl_favorites", JSON.stringify(favorites));
     });
+  });
 
-    // Track affiliate clicks
-    document.querySelectorAll(".book-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-            const site = btn.dataset.site;
-            const hotel = btn.dataset.hotel;
-            console.log(`[Analytics] Affiliate click: site=${site}, hotel=${hotel}`);
-        });
+  // Track affiliate clicks
+  document.querySelectorAll(".book-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const site = btn.dataset.site;
+      const hotel = btn.dataset.hotel;
+      console.log(`[Analytics] Affiliate click: site=${site}, hotel=${hotel}`);
     });
+  });
 
-    // Meal filter buttons
-    document.querySelectorAll(".meal-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-            document.querySelectorAll(".meal-btn").forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-        });
+  // Meal filter buttons
+  document.querySelectorAll(".meal-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".meal-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
     });
+  });
 }
 
 function buildAffiliateUrl(baseUrl, { checkin, checkout, adults, rooms, hotelId }) {
-    if (!baseUrl) return "#";
-    const url = new URL(baseUrl);
-    if (checkin) url.searchParams.set("checkin", checkin);
-    if (checkout) url.searchParams.set("checkout", checkout);
-    url.searchParams.set("adults", adults || 2);
-    url.searchParams.set("rooms", rooms || 1);
-    url.searchParams.set("utm_source", "travellab");
-    url.searchParams.set("utm_medium", "metasearch");
-    url.searchParams.set("utm_campaign", `hotel_${hotelId}`);
-    return url.toString();
+  if (!baseUrl) return "#";
+  const url = new URL(baseUrl);
+  if (checkin) url.searchParams.set("checkin", checkin);
+  if (checkout) url.searchParams.set("checkout", checkout);
+  url.searchParams.set("adults", adults || 2);
+  url.searchParams.set("rooms", rooms || 1);
+  url.searchParams.set("utm_source", "travellab");
+  url.searchParams.set("utm_medium", "metasearch");
+  url.searchParams.set("utm_campaign", `hotel_${hotelId}`);
+  return url.toString();
 }
 
 function showLoading() {
-    document.getElementById("loading-overlay")?.style && (document.getElementById("loading-overlay").style.display = "flex");
-    document.getElementById("hotel-list")?.style && (document.getElementById("hotel-list").style.display = "none");
+  document.getElementById("loading-overlay")?.style && (document.getElementById("loading-overlay").style.display = "flex");
+  document.getElementById("hotel-list")?.style && (document.getElementById("hotel-list").style.display = "none");
 }
 function hideLoading() {
-    document.getElementById("loading-overlay")?.style && (document.getElementById("loading-overlay").style.display = "none");
-    document.getElementById("hotel-list")?.style && (document.getElementById("hotel-list").style.display = "block");
+  document.getElementById("loading-overlay")?.style && (document.getElementById("loading-overlay").style.display = "none");
+  document.getElementById("hotel-list")?.style && (document.getElementById("hotel-list").style.display = "block");
 }
 function updateCount(n) {
-    const el = document.getElementById("result-count");
-    if (el) el.textContent = `${n}件のホテルが見つかりました`;
+  const el = document.getElementById("result-count");
+  if (el) el.textContent = `${n}件のホテルが見つかりました`;
 }
 function formatJpDate(str) {
-    const d = new Date(str);
-    return `${d.getMonth() + 1}月${d.getDate()}日`;
+  const d = new Date(str);
+  return `${d.getMonth() + 1}月${d.getDate()}日`;
 }
 function calcNights(checkin, checkout) {
-    const a = new Date(checkin), b = new Date(checkout);
-    return Math.max(1, Math.round((b - a) / 86400000));
+  const a = new Date(checkin), b = new Date(checkout);
+  return Math.max(1, Math.round((b - a) / 86400000));
 }

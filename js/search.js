@@ -34,16 +34,16 @@ document.addEventListener("DOMContentLoaded", () => {
     if (form) {
         form.addEventListener("submit", (e) => {
             e.preventDefault();
-            const destination = document.getElementById("destination").value.trim();
+            let destination = document.getElementById("destination").value.trim();
             const checkin = document.getElementById("checkin").value;
             const checkout = document.getElementById("checkout").value;
             const adults = document.getElementById("adults").value;
             const children = document.getElementById("children").value;
             const rooms = document.getElementById("rooms").value;
 
+            // 検索窓が空の場合はおすすめを設定
             if (!destination) {
-                showError("目的地を入力してください");
-                return;
+                destination = "おすすめ";
             }
             if (!checkin || !checkout) {
                 showError("チェックイン・チェックアウト日を選択してください");
@@ -75,6 +75,41 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     });
+
+    // --- Geolocation ---
+    const geoBtn = document.getElementById("btn-geolocation");
+    if (geoBtn) {
+        geoBtn.addEventListener("click", () => {
+            if ("geolocation" in navigator) {
+                geoBtn.innerHTML = "⏳ 取得中...";
+                geoBtn.disabled = true;
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        const dest = document.getElementById("destination");
+                        if (dest) {
+                            // api.js側でカンマ区切りを緯度経度として扱うようにしているため、カンマ区切りでセットする
+                            dest.value = `${lat},${lng}`;
+                            dest.classList.add("flash");
+                            setTimeout(() => dest.classList.remove("flash"), 600);
+                        }
+                        geoBtn.innerHTML = "📍 現在地";
+                        geoBtn.disabled = false;
+                    },
+                    (error) => {
+                        console.error("Geolocation error:", error);
+                        showError("位置情報を取得できませんでした。ブラウザの設定をご確認ください。");
+                        geoBtn.innerHTML = "📍 現在地";
+                        geoBtn.disabled = false;
+                    },
+                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                );
+            } else {
+                showError("お使いのブラウザは位置情報取得に対応していません。");
+            }
+        });
+    }
 
     // --- Destination suggestions ---
     const SUGGESTIONS = ["東京", "京都", "大阪", "沖縄", "北海道", "函館", "横浜", "奈良", "神戸", "福岡", "箱根", "軽井沢", "札幌", "仙台", "広島"];

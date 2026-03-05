@@ -1,18 +1,48 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>トラベル・ラボ | 旅行最安値比較サイト</title>
-  <meta name="description" content="楽天トラベル・じゃらん・Yahoo!トラベル・Booking.comを一括比較。国内・海外ホテルの最安値を瞬時に検索。無料で使えるホテル価格比較サービス。">
-  <meta name="keywords" content="ホテル比較,最安値,旅行,楽天トラベル,じゃらん,Yahoo!トラベル,宿泊">
-  <meta property="og:title" content="トラベル・ラボ | 旅行最安値比較サイト">
-  <meta property="og:description" content="複数の旅行サイトを一括比較して最安値を見つけよう">
+  <title>トラベル・ラボ | 国内・海外ホテル最安値の一括比較サイト</title>
+  <meta name="description"
+    content="楽天トラベル・じゃらん・Yahoo!・Booking.comのホテル宿泊料金を一括比較！全国の人気ホテルや旅館の最安値を瞬時に検索し、あなたの旅行を最もお得にする国内最大級の価格比較プラットフォーム。">
+  <meta name="keywords" content="ホテル比較,最安値,旅行,楽天トラベル,じゃらん,Yahoo!トラベル,宿泊,一括検索">
+  <!-- OGP & Twitter -->
+  <meta property="og:title" content="トラベル・ラボ | 国内・海外ホテル最安値一括比較">
+  <meta property="og:description" content="楽天・じゃらん・Yahoo!・Booking.comの宿泊料金を一斉に比較。最安値のホテルがすぐに見つかる！">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://travellab.example.com/">
+  <meta property="og:image" content="https://travellab.example.com/assets/images/ogp.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://travellab.example.com/">
+
+  <!-- Preconnect & Styles -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" href="css/style.css" as="style">
   <link rel="stylesheet" href="css/style.css">
+
+  <!-- JSON-LD Structured Data for WebSite -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "トラベル・ラボ",
+    "url": "https://travellab.example.com/",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://travellab.example.com/results.html?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4868615559787524"
+    crossorigin="anonymous"></script>
 </head>
+
 <body>
 
   <!-- ── HEADER ── -->
@@ -25,161 +55,162 @@
       <nav class="nav-links" aria-label="メインナビゲーション">
         <a href="index.html">ホーム</a>
         <a href="results.html?q=東京&checkin=2026-03-06&checkout=2026-03-07&adults=2&children=0&rooms=1">ホテル比較</a>
-        <a href="#">航空券</a>
-        <a href="#">新幹線</a>
+        <a href="flights.html">航空券</a>
+        <a href="shinkansen.html">新幹線</a>
         <a href="index.html" class="nav-cta">今すぐ検索</a>
       </nav>
       <button class="mobile-menu-btn" aria-label="メニュー">☰</button>
     </div>
   </header>
 
-  <!-- ── HERO & SEARCH ── -->
-  <section class="hero" aria-label="ホテル検索">
-    <div class="hero-bg" role="img" aria-label="日本の旅行風景"></div>
-    <div class="hero-overlay"></div>
+  <!-- ── MAIN CONTENT ── -->
+  <main>
+    <!-- ── HERO & SEARCH ── -->
+    <section class="hero" aria-label="ホテル検索">
+      <div class="hero-bg" role="img" aria-label="日本の旅行風景"></div>
+      <div class="hero-overlay"></div>
 
-    <div class="hero-content">
-      <div class="hero-badge">日本最大級の価格比較エンジン</div>
-      <h1>
-        <span class="highlight">最安値</span>のホテルを<br>
-        瞬時に見つける
-      </h1>
-      <p class="hero-sub">
-        楽天・じゃらん・Yahoo!・Booking.comを一括比較。<br>
-        もう各サイトを巡回する必要はありません。
-      </p>
+      <div class="hero-content">
+        <div class="hero-badge">日本最大級の価格比較エンジン</div>
+        <h1>
+          <span class="highlight">最安値</span>のホテルを<br>
+          瞬時に見つける
+        </h1>
+        <p class="hero-sub">
+          楽天・じゃらん・Yahoo!・Booking.comを一括比較。<br>
+          もう各サイトを巡回する必要はありません。
+        </p>
 
-      <div class="hero-stats" aria-label="サービス統計">
-        <div class="stat">
-          <div class="stat-num">1,200+</div>
-          <div class="stat-label">提携ホテル</div>
-        </div>
-        <div class="stat">
-          <div class="stat-num">4社</div>
-          <div class="stat-label">比較サイト</div>
-        </div>
-        <div class="stat">
-          <div class="stat-num">3秒</div>
-          <div class="stat-label">最安値表示</div>
-        </div>
-      </div>
-
-      <!-- Search Form -->
-      <div class="search-card">
-        <form id="search-form" novalidate>
-          <div class="search-row">
-            <!-- Destination -->
-            <div class="search-field">
-              <label for="destination">目的地・ホテル名</label>
-              <div class="dest-wrap">
-                <input
-                  type="text"
-                  id="destination"
-                  name="destination"
-                  placeholder="例：東京、京都、大阪..."
-                  autocomplete="off"
-                  aria-autocomplete="list"
-                  aria-controls="suggestions"
-                >
-                <div id="suggestions" class="suggestions-box" role="listbox" aria-label="候補"></div>
-              </div>
-            </div>
-
-            <!-- Dates -->
-            <div class="search-field">
-              <label>宿泊日</label>
-              <div class="date-group">
-                <input type="date" id="checkin" name="checkin" aria-label="チェックイン日">
-                <input type="date" id="checkout" name="checkout" aria-label="チェックアウト日">
-              </div>
-            </div>
-
-            <!-- People / Rooms -->
-            <div class="search-field">
-              <label>人数・部屋数</label>
-              <div class="count-group">
-                <select id="adults" name="adults" aria-label="大人人数">
-                  <option value="1">大人1名</option>
-                  <option value="2" selected>大人2名</option>
-                  <option value="3">大人3名</option>
-                  <option value="4">大人4名</option>
-                  <option value="5">大人5名</option>
-                  <option value="6">大人6名</option>
-                </select>
-                <select id="children" name="children" aria-label="子供人数">
-                  <option value="0" selected>子供0名</option>
-                  <option value="1">子供1名</option>
-                  <option value="2">子供2名</option>
-                  <option value="3">子供3名</option>
-                </select>
-                <select id="rooms" name="rooms" aria-label="部屋数">
-                  <option value="1" selected>1室</option>
-                  <option value="2">2室</option>
-                  <option value="3">3室</option>
-                </select>
-              </div>
-            </div>
+        <div class="hero-stats" aria-label="サービス統計">
+          <div class="stat">
+            <div class="stat-num">1,200+</div>
+            <div class="stat-label">提携ホテル</div>
           </div>
+          <div class="stat">
+            <div class="stat-num">4社</div>
+            <div class="stat-label">比較サイト</div>
+          </div>
+          <div class="stat">
+            <div class="stat-num">3秒</div>
+            <div class="stat-label">最安値表示</div>
+          </div>
+        </div>
 
-          <div id="search-error" role="alert"></div>
+        <!-- Search Form -->
+        <div class="search-card">
+          <form id="search-form" novalidate>
+            <div class="search-row">
+              <!-- Destination -->
+              <div class="search-field">
+                <label for="destination">目的地・ホテル名</label>
+                <div class="dest-wrap" style="display: flex; gap: 8px;">
+                  <div style="position: relative; flex-grow: 1;">
+                    <input type="text" id="destination" name="destination" placeholder="例：東京、京都、大阪..."
+                      autocomplete="off" aria-autocomplete="list" aria-controls="suggestions" style="width: 100%;">
+                    <div id="suggestions" class="suggestions-box" role="listbox" aria-label="候補"></div>
+                  </div>
+                  <button type="button" id="btn-geolocation" class="geo-btn" title="現在地周辺から探す" aria-label="現在地から探す">
+                    📍 現在地
+                  </button>
+                </div>
+              </div>
 
-          <button type="submit" class="search-btn" id="search-submit">
-            <span class="search-btn-icon">🔍</span>
-            最安値を比較する
-          </button>
-        </form>
-      </div>
+              <!-- Dates -->
+              <div class="search-field">
+                <label>宿泊日</label>
+                <div class="date-group">
+                  <input type="date" id="checkin" name="checkin" aria-label="チェックイン日">
+                  <input type="date" id="checkout" name="checkout" aria-label="チェックアウト日">
+                </div>
+              </div>
 
-      <!-- Quick Destinations -->
-      <div class="quick-destinations">
-        <h3>人気の目的地</h3>
-        <div class="quick-dest-list">
-          <button class="quick-dest" data-dest="東京">🗼 東京</button>
-          <button class="quick-dest" data-dest="京都">⛩️ 京都</button>
-          <button class="quick-dest" data-dest="大阪">🦔 大阪</button>
-          <button class="quick-dest" data-dest="沖縄">🌺 沖縄</button>
-          <button class="quick-dest" data-dest="北海道">❄️ 北海道</button>
-          <button class="quick-dest" data-dest="箱根">🗻 箱根</button>
+              <!-- People / Rooms -->
+              <div class="search-field">
+                <label>人数・部屋数</label>
+                <div class="count-group">
+                  <select id="adults" name="adults" aria-label="大人人数">
+                    <option value="1">大人1名</option>
+                    <option value="2" selected>大人2名</option>
+                    <option value="3">大人3名</option>
+                    <option value="4">大人4名</option>
+                    <option value="5">大人5名</option>
+                    <option value="6">大人6名</option>
+                  </select>
+                  <select id="children" name="children" aria-label="子供人数">
+                    <option value="0" selected>子供0名</option>
+                    <option value="1">子供1名</option>
+                    <option value="2">子供2名</option>
+                    <option value="3">子供3名</option>
+                  </select>
+                  <select id="rooms" name="rooms" aria-label="部屋数">
+                    <option value="1" selected>1室</option>
+                    <option value="2">2室</option>
+                    <option value="3">3室</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div id="search-error" role="alert"></div>
+
+            <button type="submit" class="search-btn" id="search-submit">
+              <span class="search-btn-icon">🔍</span>
+              最安値を比較する
+            </button>
+          </form>
+        </div>
+
+        <!-- Quick Destinations -->
+        <div class="quick-destinations">
+          <h3>人気の目的地</h3>
+          <div class="quick-dest-list">
+            <button class="quick-dest" data-dest="東京">🗼 東京</button>
+            <button class="quick-dest" data-dest="京都">⛩️ 京都</button>
+            <button class="quick-dest" data-dest="大阪">🦔 大阪</button>
+            <button class="quick-dest" data-dest="沖縄">🌺 沖縄</button>
+            <button class="quick-dest" data-dest="北海道">❄️ 北海道</button>
+            <button class="quick-dest" data-dest="箱根">🗻 箱根</button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="scroll-hint" aria-hidden="true">スクロール</div>
-  </section>
+      <div class="scroll-hint" aria-hidden="true">スクロール</div>
+    </section>
 
-  <!-- ── FEATURES STRIP ── -->
-  <section class="features-strip" aria-label="サービスの特徴">
-    <div class="features-grid">
-      <div class="feature-item">
-        <div class="feature-icon">⚡</div>
-        <div>
-          <h4>リアルタイム価格比較</h4>
-          <p>4つの大手旅行サイトを同時に検索。常に最新の価格を表示します。</p>
+    <!-- ── FEATURES STRIP ── -->
+    <section class="features-strip" aria-label="サービスの特徴">
+      <div class="features-grid">
+        <div class="feature-item">
+          <div class="feature-icon">⚡</div>
+          <div>
+            <h4>リアルタイム価格比較</h4>
+            <p>4つの大手旅行サイトを同時に検索。常に最新の価格を表示します。</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">💴</div>
+          <div>
+            <h4>最安値保証ロジック</h4>
+            <p>同一ホテルの各サイト価格を自動算出。最安値は緑バッジで一目瞭然。</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">📱</div>
+          <div>
+            <h4>モバイル最適化</h4>
+            <p>スマートフォンでもストレスなく比較・検索。いつでもどこでも使えます。</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🔒</div>
+          <div>
+            <h4>安心・安全</h4>
+            <p>予約は各公式サイトで完結。トラベル・ラボは一切個人情報を取得しません。</p>
+          </div>
         </div>
       </div>
-      <div class="feature-item">
-        <div class="feature-icon">💴</div>
-        <div>
-          <h4>最安値保証ロジック</h4>
-          <p>同一ホテルの各サイト価格を自動算出。最安値は緑バッジで一目瞭然。</p>
-        </div>
-      </div>
-      <div class="feature-item">
-        <div class="feature-icon">📱</div>
-        <div>
-          <h4>モバイル最適化</h4>
-          <p>スマートフォンでもストレスなく比較・検索。いつでもどこでも使えます。</p>
-        </div>
-      </div>
-      <div class="feature-item">
-        <div class="feature-icon">🔒</div>
-        <div>
-          <h4>安心・安全</h4>
-          <p>予約は各公式サイトで完結。トラベル・ラボは一切個人情報を取得しません。</p>
-        </div>
-      </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
   <!-- ── FOOTER ── -->
   <footer class="site-footer" aria-label="フッター">
@@ -201,27 +232,27 @@
         <div class="footer-col">
           <h4>サービス</h4>
           <nav class="footer-links">
-            <a href="#">国内ホテル比較</a>
-            <a href="#">海外ホテル比較</a>
-            <a href="#">航空券比較（準備中）</a>
-            <a href="#">新幹線予約リンク</a>
+            <a href="domestic-hotels.html">国内ホテル比較</a>
+            <a href="overseas-hotels.html">海外ホテル比較</a>
+            <a href="flights.html">航空券比較（準備中）</a>
+            <a href="shinkansen.html">新幹線予約リンク</a>
           </nav>
         </div>
         <div class="footer-col">
           <h4>サポート</h4>
           <nav class="footer-links">
-            <a href="#">使い方ガイド</a>
-            <a href="#">よくある質問</a>
-            <a href="#">お問い合わせ</a>
+            <a href="guide.html">使い方ガイド</a>
+            <a href="faq.html">よくある質問</a>
+            <a href="contact.html">お問い合わせ</a>
           </nav>
         </div>
         <div class="footer-col">
           <h4>法的情報</h4>
           <nav class="footer-links">
-            <a href="#">利用規約</a>
-            <a href="#">プライバシーポリシー</a>
-            <a href="#">特定商取引法の表記</a>
-            <a href="#">免責事項</a>
+            <a href="terms.html">利用規約</a>
+            <a href="privacy.html">プライバシーポリシー</a>
+            <a href="law.html">特定商取引法の表記</a>
+            <a href="disclaimer.html">免責事項</a>
           </nav>
         </div>
       </div>
@@ -236,4 +267,5 @@
 
   <script src="js/search.js"></script>
 </body>
+
 </html>
