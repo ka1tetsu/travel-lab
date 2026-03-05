@@ -26,60 +26,49 @@ const RAKUTEN_AREA_MAPPING = {
 };
 
 /**
- * 革新的な「ムード・気分」ベースのキーワード抽出
+ * 簡易的な形態素解析（ストップワード除去）
  */
-function extractMoodKeyword(text) {
+function cleanKeyword(text) {
     if (!text) return "";
     let k = text;
-
-    // 革新的な「ムード（気分）検索」マッピング
-    const moodMap = {
-        "リラックス": "温泉",
-        "疲れた": "温泉 癒やし",
-        "海が見たい": "オーシャンビュー",
-        "海": "オーシャンビュー",
-        "デート": "夜景 カップル",
-        "家族": "ファミリールーム",
-        "子供": "キッズ",
-        "自然": "大自然",
-        "美味しい": "バイキング 食べ放題",
-        "おいしい": "グルメ",
-        "ディズニー": "舞浜",
-        "usj": "ユニバーサル",
-        "ユニバ": "ユニバーサル",
-        "雪": "スキー",
-        "映え": "インスタ映え",
-        "山": "絶景",
-        "都会": "夜景",
-        "田舎": "古民家",
-        "非日常": "高級リゾート"
-    };
-
-    let moodAdded = "";
-    for (const [key, val] of Object.entries(moodMap)) {
-        if (text.includes(key)) {
-            moodAdded += " " + val;
-        }
-    }
-
-    // 極めて強力なストップワード辞書
+    // 冗長な表現の除去
     const stopWords = [
         "の近くの", "の周辺の", "の周りの", "のそばの",
         "の近く", "の周辺", "の周り", "のそば",
-        "に行きたい", "を探して", "を教えて", "を探す", "をさがす", "したい", "見たい",
+        "に行きたい", "を探して", "を教えて", "を探す", "をさがす",
         "に泊まりたい", "に泊まる", "泊まれる", "泊まる",
         "おすすめの", "おすすめ", "オススメの", "オススメ",
-        "安くて", "安い", "高級な", "豪華な", "綺麗な", "きれいな", "おしゃれな", "オシャレな",
-        "ホテル", "旅館", "宿", "宿泊", "旅行", "観光", "ビジネスホテル", "カプセルホテル", "リゾート",
-        "で", "や", "の", "は", "が", "を", "に", "へ", "と", "から", "より",
-        "県", "都", "府", "市", "区", "町", "村"
+        "ホテル", "旅館", "宿", "宿泊", "旅行", "観光"
     ];
-
     stopWords.forEach(word => {
         k = k.replace(new RegExp(word, 'g'), " ");
     });
+    return k.replace(/\s+/g, " ").trim();
+}
 
-    return (k + moodAdded).replace(/\s+/g, " ").trim();
+/**
+ * Wikipedia APIを用いて地名・ランドマークから座標を取得
+ * 高精度な日本国内のランドマーク検索用
+ */
+async function getWikiCoordinates(keyword) {
+    if (!keyword || keyword.length < 2) return null;
+    const url = `https://ja.wikipedia.org/w/api.php?action=query&prop=coordinates&titles=${encodeURIComponent(keyword)}&format=json&origin=*`;
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.query && data.query.pages) {
+            const pages = data.query.pages;
+            for (let pageId in pages) {
+                if (pages[pageId].coordinates && pages[pageId].coordinates.length > 0) {
+                    const coord = pages[pageId].coordinates[0];
+                    return { lat: coord.lat, lng: coord.lon };
+                }
+            }
+        }
+    } catch (e) {
+        console.error("Wiki Geocoding Error:", e);
+    }
+    return null;
 }
 
 /**
@@ -98,56 +87,69 @@ async function fetchHotelsArray(url) {
 }
 
 /**
- * 楽天APIからホテル情報を取得する（革新的ムード検索＆ガチャ機能付き）
+ * 楽天APIからホテル情報を取得する（堅牢な5段階フォールバック検索）
  * @param {string} rawQuery ユーザー入力の生の検索文字列
  * @param {string} checkin チェックイン日 (YYYY-MM-DD)
  * @param {string} checkout チェックアウト日 (YYYY-MM-DD)
  * @returns {Promise<Array>} ホテル情報の配列
  */
 async function fetchRakutenHotels(rawQuery, checkin, checkout) {
-    if (!rawQuery) rawQuery = "東京";
+    if (!rawQuery) rawQuery = "東京"; // Default searching
 
     const baseVacantUrl = `https://openapi.rakuten.co.jp/engine/api/Travel/VacantHotelSearch/20170426?format=json&applicationId=${RAKUTEN_APP_ID}&accessKey=${RAKUTEN_ACCESS_KEY}&searchRadius=3`;
+    const baseKeywordUrl = `https://openapi.rakuten.co.jp/engine/api/Travel/KeywordHotelSearch/20170426?format=json&applicationId=${RAKUTEN_APP_ID}&accessKey=${RAKUTEN_ACCESS_KEY}`;
+
+    // VacantHotelSearchは日付パラメータが必須
     const dateParams = (checkin && checkout) ? `&checkinDate=${checkin}&checkoutDate=${checkout}` : "";
 
     let hotels = [];
 
-    // --- 第1段階：現在地検索（座標が渡された場合は絶対的な最優先） ---
+    // --- Phase 1: 直座標指定（現在地ボタン使用時） ---
     if (rawQuery.includes(",")) {
         const [lat, lng] = rawQuery.replace(/\s/g, "").split(",");
-        if (!isNaN(parseFloat(lat)) && !isNaN(parseFloat(lng))) {
-            const geoUrl = `${baseVacantUrl}&latitude=${lat}&longitude=${lng}${dateParams}`;
-            hotels = await fetchHotelsArray(geoUrl);
-            if (hotels.length > 0) return hotels; // 座標で見つかれば即座に返す
+        if (!isNaN(parseFloat(lat)) && !isNaN(parseFloat(lng)) && dateParams) {
+            hotels = await fetchHotelsArray(`${baseVacantUrl}&latitude=${lat}&longitude=${lng}${dateParams}`);
+            if (hotels.length > 0) return hotels;
         }
     }
 
-    // --- 第2段階：革新的な「ムード（気分）＆キーワード」検索 ---
-    // Nominatim(ジオコーディング)はヒット率を著しく下げるため廃止し、楽天の強力なキーワード検索に完全に任せる
-    const innovativeKeyword = extractMoodKeyword(rawQuery) || rawQuery;
-    const searchWord = innovativeKeyword === "" ? "おすすめ" : innovativeKeyword;
-    console.log(`[Phase 2] Innovative Keyword Search: ${searchWord}`);
+    const cleanedWord = cleanKeyword(rawQuery);
+    const searchWord = cleanedWord || rawQuery;
 
-    let keywordUrl = `https://openapi.rakuten.co.jp/engine/api/Travel/KeywordHotelSearch/20170426?format=json&applicationId=${RAKUTEN_APP_ID}&accessKey=${RAKUTEN_ACCESS_KEY}&keyword=${encodeURIComponent(searchWord)}`;
-    hotels = await fetchHotelsArray(keywordUrl);
+    // --- Phase 2: Wikipedia APIを活用したランドマーク周辺検索 ---
+    // 名所や施設名で検索された場合、Wikipediaで座標を引いてから半径3kmの空室を探す
+    const geo = await getWikiCoordinates(searchWord);
+    if (geo && dateParams) {
+        console.log(`[Phase 2] Wiki GeoSearch Lat: ${geo.lat}, Lng: ${geo.lng} for ${searchWord}`);
+        hotels = await fetchHotelsArray(`${baseVacantUrl}&latitude=${geo.lat}&longitude=${geo.lng}${dateParams}`);
+        if (hotels.length > 0) return hotels;
+    }
 
-    // --- 第3段階：結果ゼロの場合は「旅行先ガチャ（Surprise Me!）」を発動 ---
-    if (hotels.length === 0) {
-        const gachaPlaces = ["箱根 温泉", "京都の奥座敷", "沖縄 プライベートビーチ", "札幌 海鮮", "草津温泉 湯畑", "熱海 海の見える", "軽井沢 森の中", "由布院 離れ", "金沢 絶景"];
-        const randomPlace = gachaPlaces[Math.floor(Math.random() * gachaPlaces.length)];
-        console.log(`[Phase 3] 0 Results! Triggering Tourism Gacha: ${randomPlace}`);
+    // --- Phase 3: 楽天APIの完全一致キーワード検索 ---
+    console.log(`[Phase 3] Keyword Search: ${searchWord}`);
+    hotels = await fetchHotelsArray(`${baseKeywordUrl}&keyword=${encodeURIComponent(searchWord)}`);
+    if (hotels.length > 0) return hotels;
 
-        keywordUrl = `https://openapi.rakuten.co.jp/engine/api/Travel/KeywordHotelSearch/20170426?format=json&applicationId=${RAKUTEN_APP_ID}&accessKey=${RAKUTEN_ACCESS_KEY}&keyword=${encodeURIComponent(randomPlace)}`;
-        hotels = await fetchHotelsArray(keywordUrl);
+    // --- Phase 4: クエリ緩和（文章を分割し、最も特徴的な長い単語だけで再検索） ---
+    const words = searchWord.split(/[\s　]+/);
+    if (words.length > 1) {
+        const longestWord = words.reduce((a, b) => a.length > b.length ? a : b);
+        console.log(`[Phase 4] Relaxed Keyword Search: ${longestWord}`);
+        hotels = await fetchHotelsArray(`${baseKeywordUrl}&keyword=${encodeURIComponent(longestWord)}`);
+        if (hotels.length > 0) return hotels;
+    }
 
-        // ガチャ発動のフラグを立てておき、フロント側で「〇〇は見つかりませんでした！代わりに〇〇のおすすめです！」と出せるようにする
-        if (hotels.length > 0) {
-            hotels[0].isGacha = true;
-            hotels[0].gachaKeyword = randomPlace;
+    // --- Phase 5: 最終フォールバック（入力に含まれる都道府県・主要都市レベルでの検索） ---
+    const majorAreas = ["北海道", "青森", "岩手", "宮城", "秋田", "山形", "福島", "茨城", "栃木", "群馬", "埼玉", "千葉", "東京", "神奈川", "箱根", "新潟", "富山", "石川", "福井", "山梨", "長野", "軽井沢", "岐阜", "静岡", "愛知", "名古屋", "三重", "滋賀", "京都", "大阪", "兵庫", "神戸", "奈良", "和歌山", "鳥取", "島根", "岡山", "広島", "山口", "徳島", "香川", "愛媛", "高知", "福岡", "佐賀", "長崎", "熊本", "大分", "宮崎", "鹿児島", "沖縄"];
+    for (const area of majorAreas) {
+        if (rawQuery.includes(area) || rawQuery.includes(area.replace(/(都|道|府|県)$/, ''))) {
+            console.log(`[Phase 5] Area Fallback: ${area}`);
+            hotels = await fetchHotelsArray(`${baseKeywordUrl}&keyword=${encodeURIComponent(area)}`);
+            if (hotels.length > 0) return hotels;
         }
     }
 
-    return hotels;
+    return hotels; // 全部ダメなら0件
 }
 
 /**
