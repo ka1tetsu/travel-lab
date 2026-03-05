@@ -20,12 +20,17 @@ document.addEventListener("DOMContentLoaded", () => {
   showLoading();
   (async () => {
     try {
-      // 楽天APIからホテル情報を非同期取得
-      const apiData = await fetchRakutenHotels(query);
+      // 楽天APIからホテル情報を非同期取得 (日付も渡す)
+      const apiData = await fetchRakutenHotels(query, checkin, checkout);
 
       if (apiData && apiData.length > 0) {
         // 取得したデータをフロントの表示フォーマットにマッピング（実際のホテル画像等を含む）
         currentHotels = mapRakutenToTravelLab(apiData, query, { checkin, checkout, adults, rooms });
+        // ガチャフラグを引き継ぎ
+        if (apiData[0] && apiData[0].isGacha) {
+          currentHotels[0].isGacha = true;
+          currentHotels[0].gachaKeyword = apiData[0].gachaKeyword;
+        }
       } else {
         // API結果が0件、もしくはエラーの場合はローカルのモックデータへフォールバック
         console.warn("APIからデータが取得できませんでした。モックデータにフォールバックします。");
@@ -164,6 +169,7 @@ function renderResults(hotels, opts) {
   const sorted = sortHotels(hotels, "price-asc");
   const list = document.getElementById("hotel-list");
   if (!list) return;
+
   if (sorted.length === 0) {
     list.innerHTML = `<div class="no-results">
       <div class="no-results-icon">🔍</div>
@@ -172,7 +178,20 @@ function renderResults(hotels, opts) {
     </div>`;
     return;
   }
-  list.innerHTML = sorted.map(h => buildHotelCard(h, opts)).join("");
+
+  // ガチャでおすすめされた場合の特別メッセージ
+  let gachaHtml = "";
+  if (hotels.length > 0 && hotels.some(h => h.isGacha)) {
+    const kw = hotels.find(h => h.gachaKeyword)?.gachaKeyword || "おすすめスポット";
+    gachaHtml = `
+        <div class="gacha-notice" style="background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%); color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; text-align: center; box-shadow: 0 4px 10px rgba(255,107,107,0.3); animation: fadeIn 0.5s ease-out;">
+          <span style="font-size: 1.2rem;">✨ ご指定の条件で見つからなかったため、特別に『${kw}』の人気おすすめ宿をご提案します！ ✨</span>
+          <p style="margin-top: 5px; font-size: 0.9rem; opacity: 0.9;">革新的なトラベルAIがあなたにぴったりの代替案を自動生成しました。</p>
+        </div>
+      `;
+  }
+
+  list.innerHTML = gachaHtml + sorted.map(h => buildHotelCard(h, opts)).join("");
   attachCardEvents();
 }
 

@@ -35,13 +35,96 @@ document.addEventListener("DOMContentLoaded", () => {
         form.addEventListener("submit", (e) => {
             e.preventDefault();
             let destination = document.getElementById("destination").value.trim();
-            const checkin = document.getElementById("checkin").value;
-            const checkout = document.getElementById("checkout").value;
-            const adults = document.getElementById("adults").value;
-            const children = document.getElementById("children").value;
-            const rooms = document.getElementById("rooms").value;
+            // 先に進む前に現在のデフォルト値を取得
+            let checkin = document.getElementById("checkin").value;
+            let checkout = document.getElementById("checkout").value;
+            let adults = document.getElementById("adults").value;
+            let children = document.getElementById("children").value;
+            let rooms = document.getElementById("rooms").value;
 
-            // 検索窓が空の場合はおすすめを設定
+            // --- 自然言語解析 (NLU) 日付・人数の抽出 ---
+            const today = new Date();
+
+            // 抽出と置換処理用ヘルパー
+            const extractAndRemove = (pattern, callback) => {
+                const match = destination.match(pattern);
+                if (match) {
+                    callback(match);
+                    destination = destination.replace(pattern, " ").replace(/\s+/g, " ").trim();
+                }
+            };
+
+            // 1. 人数の抽出
+            extractAndRemove(/(?:大人)?([1-9１-９])(?:人|名)/, (m) => {
+                adults = parseInt(m[1].replace(/[１-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0)));
+            });
+            extractAndRemove(/カップル|ふたり|夫婦/, () => { adults = 2; });
+            extractAndRemove(/家族|ファミリー/, () => {
+                adults = 2;
+                children = (parseInt(children) === 0) ? 1 : children; // 家族の場合は子供も追加
+            });
+            extractAndRemove(/一人|ひとり|ぼっち/, () => { adults = 1; });
+
+            // 2. 日付の抽出 (相対指定)
+            extractAndRemove(/今日|本日/, () => {
+                const d = new Date(today);
+                checkin = formatDate(d);
+                d.setDate(d.getDate() + 1);
+                checkout = formatDate(d);
+            });
+            extractAndRemove(/明日|あした/, () => {
+                const d = new Date(today);
+                d.setDate(d.getDate() + 1);
+                checkin = formatDate(d);
+                d.setDate(d.getDate() + 1);
+                checkout = formatDate(d);
+            });
+            extractAndRemove(/明後日|あさって/, () => {
+                const d = new Date(today);
+                d.setDate(d.getDate() + 2);
+                checkin = formatDate(d);
+                d.setDate(d.getDate() + 1);
+                checkout = formatDate(d);
+            });
+            extractAndRemove(/今週末|週末/, () => {
+                const d = new Date(today);
+                const dayToFriday = (5 - d.getDay() + 7) % 7 || 7; // 次の(または今の)金曜日
+                d.setDate(d.getDate() + dayToFriday);
+                checkin = formatDate(d);
+                d.setDate(d.getDate() + 2); // 日曜日チェックアウト
+                checkout = formatDate(d);
+            });
+            extractAndRemove(/来週末/, () => {
+                const d = new Date(today);
+                const dayToFriday = (5 - d.getDay() + 7) % 7 + 7; // 来週の金曜日
+                d.setDate(d.getDate() + dayToFriday);
+                checkin = formatDate(d);
+                d.setDate(d.getDate() + 2); // 日曜日チェックアウト
+                checkout = formatDate(d);
+            });
+
+            // 3. 日付の抽出 (絶対指定 e.g., "3月15日", "12/5")
+            // パターン: (月)月(日)日 または (月)/(日)
+            extractAndRemove(/([1-9１-９]{1,2})[月\/]([1-9１-９]{1,2})[日]?/, (m) => {
+                const mStr = m[1].replace(/[１-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0));
+                const dStr = m[2].replace(/[１-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0));
+                let y = today.getFullYear();
+                const month = parseInt(mStr) - 1;
+                const date = parseInt(dStr);
+
+                // 指定された日付が過去の場合は来年と解釈する
+                let targetDate = new Date(y, month, date);
+                if (targetDate < new Date(today.getFullYear(), today.getMonth(), today.getDate())) {
+                    targetDate = new Date(y + 1, month, date);
+                }
+
+                checkin = formatDate(targetDate);
+                targetDate.setDate(targetDate.getDate() + 1); // 1泊とする
+                checkout = formatDate(targetDate);
+            });
+
+
+            // 検索窓が空（またはすべて抽出されて空になった）場合はおすすめを設定
             if (!destination) {
                 destination = "おすすめ";
             }
