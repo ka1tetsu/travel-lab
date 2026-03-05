@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>検索結果 | トラベル・ラボ</title>
+    <meta name="description" content="ホテルの最安値比較結果。楽天・じゃらん・Yahoo!・Booking.comを横断比較して最安値を表示しています。">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <!-- ── HEADER ── -->
+    <header class="site-header">
+        <div class="header-inner">
+            <a href="index.html" class="logo" aria-label="トラベル・ラボ トップへ">
+                <span class="logo-icon">✈</span>
+                トラベル<span>・</span>ラボ
+            </a>
+            <nav class="nav-links" aria-label="メインナビゲーション">
+                <a href="index.html">ホーム</a>
+                <a href="#">ホテル比較</a>
+                <a href="#">航空券</a>
+                <a href="#">新幹線</a>
+                <a href="index.html" class="nav-cta">新しい検索</a>
+            </nav>
+            <button class="mobile-menu-btn" aria-label="メニュー">☰</button>
+        </div>
+    </header>
+
+    <!-- ── SEARCH SUMMARY BAR ── -->
+    <div class="results-topbar" role="navigation" aria-label="検索条件">
+        <div class="container">
+            <div id="search-summary" aria-live="polite">読み込み中...</div>
+            <a href="index.html" class="modify-search-btn">✏️ 条件変更</a>
+        </div>
+    </div>
+
+    <!-- ── RESULTS LAYOUT ── -->
+    <div class="results-layout" role="main">
+
+        <!-- ── Filter Sidebar ── -->
+        <aside class="filter-sidebar" aria-label="絞り込み条件">
+            <h3>🎛️ 絞り込み</h3>
+
+            <!-- Price Slider -->
+            <div class="filter-section">
+                <h4>予算（1泊/室）</h4>
+                <div class="price-slider-wrap">
+                    <div class="price-range-label">
+                        <span>¥0</span>
+                        <span>〜 <span class="price-range-val" id="price-max-val">99,999</span>円</span>
+                    </div>
+                    <input type="range" id="price-max" min="5000" max="99999" value="99999" step="1000"
+                        aria-label="最大価格">
+                </div>
+            </div>
+
+            <!-- Meal Plan -->
+            <div class="filter-section">
+                <h4>食事プラン</h4>
+                <div class="meal-buttons" role="group" aria-label="食事プラン選択">
+                    <button class="meal-btn active" data-meal="all">すべて</button>
+                    <button class="meal-btn" data-meal="素泊まり">🛏️ 素泊まり</button>
+                    <button class="meal-btn" data-meal="朝食付">🍳 朝食付き</button>
+                    <button class="meal-btn" data-meal="2食付">🍽️ 2食付き</button>
+                </div>
+            </div>
+
+            <!-- Amenities -->
+            <div class="filter-section">
+                <h4>施設設備</h4>
+                <div class="amenity-list" role="group" aria-label="設備条件">
+                    <label class="amenity-check-item">
+                        <input type="checkbox" class="amenity-check" value="wifi" id="chk-wifi">
+                        <span>📶 Wi-Fi</span>
+                    </label>
+                    <label class="amenity-check-item">
+                        <input type="checkbox" class="amenity-check" value="parking" id="chk-parking">
+                        <span>🅿️ 駐車場</span>
+                    </label>
+                    <label class="amenity-check-item">
+                        <input type="checkbox" class="amenity-check" value="onsen" id="chk-onsen">
+                        <span>♨️ 温泉・大浴場</span>
+                    </label>
+                    <label class="amenity-check-item">
+                        <input type="checkbox" class="amenity-check" value="pool" id="chk-pool">
+                        <span>🏊 プール</span>
+                    </label>
+                    <label class="amenity-check-item">
+                        <input type="checkbox" class="amenity-check" value="gym" id="chk-gym">
+                        <span>💪 フィットネス</span>
+                    </label>
+                    <label class="amenity-check-item">
+                        <input type="checkbox" class="amenity-check" value="beach" id="chk-beach">
+                        <span>🏖️ ビーチ</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Filter Buttons -->
+            <div class="filter-actions">
+                <button class="btn-apply" id="apply-filters" type="button">絞り込む</button>
+                <button class="btn-reset" id="reset-filters" type="button">リセット</button>
+            </div>
+        </aside>
+
+        <!-- ── Results Main ── -->
+        <section class="results-main" aria-label="検索結果一覧">
+            <div class="results-header">
+                <p id="result-count" aria-live="polite">検索中...</p>
+                <div class="sort-bar" role="group" aria-label="並び替え">
+                    <button class="sort-btn active" data-sort="price-asc">💰 最安値順</button>
+                    <button class="sort-btn" data-sort="price-desc">💎 高額順</button>
+                    <button class="sort-btn" data-sort="rating">⭐ 評価順</button>
+                    <button class="sort-btn" data-sort="reviews">📝 レビュー数順</button>
+                </div>
+            </div>
+
+            <!-- Loading state -->
+            <div id="loading-overlay" role="status" aria-label="検索中" aria-live="polite">
+                <div class="loading-spinner" aria-hidden="true"></div>
+                <p class="loading-text">4つのサイトを同時に比較中...</p>
+                <div class="loading-sites" aria-hidden="true">
+                    <span class="loading-site ls-rakuten">楽天トラベル</span>
+                    <span class="loading-site ls-jalan">じゃらん</span>
+                    <span class="loading-site ls-yahoo">Yahoo!トラベル</span>
+                    <span class="loading-site ls-booking">Booking.com</span>
+                </div>
+            </div>
+
+            <!-- Hotel List -->
+            <div id="hotel-list" aria-label="ホテル一覧" style="display:none;"></div>
+
+        </section>
+    </div>
+
+    <!-- ── FOOTER ── -->
+    <footer class="site-footer" aria-label="フッター">
+        <div class="footer-inner">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="index.html" class="logo">
+                        <span class="logo-icon">✈</span>
+                        トラベル<span>・</span>ラボ
+                    </a>
+                    <p>複数の旅行サイトを一括比較し、最安値のホテルを簡単に見つけられるメタサーチプラットフォームです。</p>
+                </div>
+                <div class="footer-col">
+                    <h4>サービス</h4>
+                    <nav class="footer-links">
+                        <a href="#">国内ホテル比較</a>
+                        <a href="#">海外ホテル比較</a>
+                        <a href="#">航空券比較（準備中）</a>
+                    </nav>
+                </div>
+                <div class="footer-col">
+                    <h4>サポート</h4>
+                    <nav class="footer-links">
+                        <a href="#">使い方ガイド</a>
+                        <a href="#">よくある質問</a>
+                        <a href="#">お問い合わせ</a>
+                    </nav>
+                </div>
+                <div class="footer-col">
+                    <h4>法的情報</h4>
+                    <nav class="footer-links">
+                        <a href="#">利用規約</a>
+                        <a href="#">プライバシーポリシー</a>
+                        <a href="#">免責事項</a>
+                    </nav>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 トラベル・ラボ. All rights reserved.</p>
+                <p style="margin-top:6px; font-size:.72rem;">
+                    本サービスはアフィリエイト広告を含みます。各サイトの最終価格は予約時にご確認ください。
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/results.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,237 @@
+// ============================================================
+// Travel Lab - Mock Hotel Data
+// ============================================================
+
+const HOTELS = [
+  {
+    id: 1,
+    name: "ホテル グランドパレス 東京",
+    area: "東京",
+    address: "東京都千代田区一ツ橋1-1-1",
+    category: "シティホテル",
+    stars: 5,
+    rating: 4.7,
+    reviewCount: 1842,
+    image: "assets/images/hotel_tokyo.png",
+    amenities: ["wifi", "parking", "onsen", "breakfast", "gym", "pool"],
+    description: "皇居を望む最上の立地。東京の中心で格別のラグジュアリー体験を。",
+    prices: {
+      rakuten:  { price: 28500, url: "https://travel.rakuten.co.jp/?af=travlab", mealPlan: "素泊まり" },
+      jalan:    { price: 27800, url: "https://www.jalan.net/?sc_cid=travlab",   mealPlan: "素泊まり" },
+      yahoo:    { price: 29200, url: "https://travel.yahoo.co.jp/?travlab=1",   mealPlan: "素泊まり" },
+      booking:  { price: 31000, url: "https://www.booking.com/?aid=travlab",    mealPlan: "素泊まり" },
+    },
+  },
+  {
+    id: 2,
+    name: "渋谷スカイビューホテル",
+    area: "東京",
+    address: "東京都渋谷区道玄坂2-24-1",
+    category: "ビジネスホテル",
+    stars: 4,
+    rating: 4.3,
+    reviewCount: 967,
+    image: "assets/images/hotel_tokyo.png",
+    amenities: ["wifi", "breakfast", "gym"],
+    description: "渋谷スクランブルスクエア隣接。アクセス抜群のスマートステイ。",
+    prices: {
+      rakuten:  { price: 14200, url: "https://travel.rakuten.co.jp/?af=travlab", mealPlan: "朝食付" },
+      jalan:    { price: 13500, url: "https://www.jalan.net/?sc_cid=travlab",   mealPlan: "朝食付" },
+      yahoo:    { price: 14800, url: "https://travel.yahoo.co.jp/?travlab=1",   mealPlan: "朝食付" },
+      booking:  { price: 15200, url: "https://www.booking.com/?aid=travlab",    mealPlan: "朝食付" },
+    },
+  },
+  {
+    id: 3,
+    name: "新宿ファーストクラスステイ",
+    area: "東京",
+    address: "東京都新宿区西新宿2-7-2",
+    category: "ビジネスホテル",
+    stars: 3,
+    rating: 4.1,
+    reviewCount: 2301,
+    image: "assets/images/hotel_tokyo.png",
+    amenities: ["wifi", "parking"],
+    description: "新宿駅徒歩3分。コスパ最強のビジネス向けホテル。",
+    prices: {
+      rakuten:  { price: 7800,  url: "https://travel.rakuten.co.jp/?af=travlab", mealPlan: "素泊まり" },
+      jalan:    { price: 8200,  url: "https://www.jalan.net/?sc_cid=travlab",   mealPlan: "素泊まり" },
+      yahoo:    { price: 7500,  url: "https://travel.yahoo.co.jp/?travlab=1",   mealPlan: "素泊まり" },
+      booking:  { price: 8900,  url: "https://www.booking.com/?aid=travlab",    mealPlan: "素泊まり" },
+    },
+  },
+  {
+    id: 4,
+    name: "浅草 和の宿 風雅",
+    area: "東京",
+    address: "東京都台東区浅草2-3-4",
+    category: "旅館",
+    stars: 4,
+    rating: 4.6,
+    reviewCount: 543,
+    image: "assets/images/hotel_tokyo.png",
+    amenities: ["wifi", "onsen", "breakfast"],
+    description: "浅草の下町風情に包まれた純和風旅館。夕食は本格懐石料理。",
+    prices: {
+      rakuten:  { price: 19800, url: "https://travel.rakuten.co.jp/?af=travlab", mealPlan: "2食付" },
+      jalan:    { price: 20500, url: "https://www.jalan.net/?sc_cid=travlab",   mealPlan: "2食付" },
+      yahoo:    { price: 19200, url: "https://travel.yahoo.co.jp/?travlab=1",   mealPlan: "2食付" },
+      booking:  { price: null,  url: null,                                       mealPlan: null },
+    },
+  },
+  {
+    id: 5,
+    name: "東京ベイ マリーナホテル",
+    area: "東京",
+    address: "東京都江東区有明3-2-1",
+    category: "リゾートホテル",
+    stars: 5,
+    rating: 4.5,
+    reviewCount: 789,
+    image: "assets/images/hotel_tokyo.png",
+    amenities: ["wifi", "pool", "gym", "parking", "breakfast"],
+    description: "東京湾を望むシービュールーム。プールとスパで癒しの時間を。",
+    prices: {
+      rakuten:  { price: 32000, url: "https://travel.rakuten.co.jp/?af=travlab", mealPlan: "素泊まり" },
+      jalan:    { price: 31500, url: "https://www.jalan.net/?sc_cid=travlab",   mealPlan: "素泊まり" },
+      yahoo:    { price: 33500, url: "https://travel.yahoo.co.jp/?travlab=1",   mealPlan: "素泊まり" },
+      booking:  { price: 30800, url: "https://www.booking.com/?aid=travlab",    mealPlan: "素泊まり" },
+    },
+  },
+  {
+    id: 6,
+    name: "京都 嵐山 竹の宿",
+    area: "京都",
+    address: "京都府京都市右京区嵯峨天龍寺芒ノ馬場町",
+    category: "旅館",
+    stars: 5,
+    rating: 4.9,
+    reviewCount: 412,
+    image: "assets/images/hotel_kyoto.png",
+    amenities: ["wifi", "onsen", "breakfast", "parking"],
+    description: "嵐山の竹林に佇む隠れ家旅館。全室露天風呂付きの贅沢な滞在。",
+    prices: {
+      rakuten:  { price: 45000, url: "https://travel.rakuten.co.jp/?af=travlab", mealPlan: "2食付" },
+      jalan:    { price: 43500, url: "https://www.jalan.net/?sc_cid=travlab",   mealPlan: "2食付" },
+      yahoo:    { price: 46000, url: "https://travel.yahoo.co.jp/?travlab=1",   mealPlan: "2食付" },
+      booking:  { price: null,  url: null,                                       mealPlan: null },
+    },
+  },
+  {
+    id: 7,
+    name: "京都四条 モダンステイ",
+    area: "京都",
+    address: "京都府京都市下京区四条通麩屋町東入ル",
+    category: "ビジネスホテル",
+    stars: 3,
+    rating: 4.2,
+    reviewCount: 1156,
+    image: "assets/images/hotel_kyoto.png",
+    amenities: ["wifi", "breakfast"],
+    description: "四条河原町から徒歩5分。観光の拠点に最適なスタイリッシュホテル。",
+    prices: {
+      rakuten:  { price: 10500, url: "https://travel.rakuten.co.jp/?af=travlab", mealPlan: "朝食付" },
+      jalan:    { price: 9800,  url: "https://www.jalan.net/?sc_cid=travlab",   mealPlan: "朝食付" },
+      yahoo:    { price: 10200, url: "https://travel.yahoo.co.jp/?travlab=1",   mealPlan: "朝食付" },
+      booking:  { price: 11500, url: "https://www.booking.com/?aid=travlab",    mealPlan: "朝食付" },
+    },
+  },
+  {
+    id: 8,
+    name: "大阪 道頓堀 ルーフトップホテル",
+    area: "大阪",
+    address: "大阪府大阪市中央区道頓堀1-7-21",
+    category: "ブティックホテル",
+    stars: 4,
+    rating: 4.4,
+    reviewCount: 832,
+    image: "assets/images/hotel_osaka.png",
+    amenities: ["wifi", "gym", "breakfast"],
+    description: "道頓堀の賑わいを高みから楽しむルーフトップバー完備のホテル。",
+    prices: {
+      rakuten:  { price: 16800, url: "https://travel.rakuten.co.jp/?af=travlab", mealPlan: "朝食付" },
+      jalan:    { price: 15900, url: "https://www.jalan.net/?sc_cid=travlab",   mealPlan: "朝食付" },
+      yahoo:    { price: 17200, url: "https://travel.yahoo.co.jp/?travlab=1",   mealPlan: "朝食付" },
+      booking:  { price: 15500, url: "https://www.booking.com/?aid=travlab",    mealPlan: "朝食付" },
+    },
+  },
+  {
+    id: 9,
+    name: "沖縄 恩納村 オーシャンリゾート",
+    area: "沖縄",
+    address: "沖縄県国頭郡恩納村前兼久1490",
+    category: "リゾートホテル",
+    stars: 5,
+    rating: 4.8,
+    reviewCount: 2045,
+    image: "assets/images/hotel_okinawa.png",
+    amenities: ["wifi", "pool", "beach", "gym", "breakfast", "parking"],
+    description: "エメラルドグリーンの海に面したプライベートビーチ付き5つ星リゾート。",
+    prices: {
+      rakuten:  { price: 52000, url: "https://travel.rakuten.co.jp/?af=travlab", mealPlan: "朝食付" },
+      jalan:    { price: 50500, url: "https://www.jalan.net/?sc_cid=travlab",   mealPlan: "朝食付" },
+      yahoo:    { price: 53500, url: "https://travel.yahoo.co.jp/?travlab=1",   mealPlan: "朝食付" },
+      booking:  { price: 49800, url: "https://www.booking.com/?aid=travlab",    mealPlan: "朝食付" },
+    },
+  },
+  {
+    id: 10,
+    name: "北海道 ニセコ 白銀の宿",
+    area: "北海道",
+    address: "北海道虻田郡ニセコ町字ニセコ488",
+    category: "旅館",
+    stars: 4,
+    rating: 4.6,
+    reviewCount: 678,
+    image: "assets/images/hotel_hokkaido.png",
+    amenities: ["wifi", "onsen", "breakfast", "parking", "ski"],
+    description: "世界最高の粉雪で有名なニセコ。スキーと温泉を同時に堪能。",
+    prices: {
+      rakuten:  { price: 38000, url: "https://travel.rakuten.co.jp/?af=travlab", mealPlan: "2食付" },
+      jalan:    { price: 36500, url: "https://www.jalan.net/?sc_cid=travlab",   mealPlan: "2食付" },
+      yahoo:    { price: 39500, url: "https://travel.yahoo.co.jp/?travlab=1",   mealPlan: "2食付" },
+      booking:  { price: 35000, url: "https://www.booking.com/?aid=travlab",    mealPlan: "2食付" },
+    },
+  },
+];
+
+// Helper: get minimum price for a hotel
+function getMinPrice(hotel) {
+  const prices = Object.values(hotel.prices)
+    .filter(p => p.price !== null)
+    .map(p => p.price);
+  return Math.min(...prices);
+}
+
+// Helper: get which site has minimum price
+function getCheapestSite(hotel) {
+  let minSite = null;
+  let minPrice = Infinity;
+  for (const [site, data] of Object.entries(hotel.prices)) {
+    if (data.price !== null && data.price < minPrice) {
+      minPrice = data.price;
+      minSite = site;
+    }
+  }
+  return minSite;
+}
+
+// Helper: amenity icon mapping
+const AMENITY_ICONS = {
+  wifi:      { icon: "📶", label: "Wi-Fi" },
+  parking:   { icon: "🅿️", label: "駐車場" },
+  onsen:     { icon: "♨️", label: "温泉" },
+  breakfast: { icon: "🍽️", label: "朝食" },
+  gym:       { icon: "💪", label: "ジム" },
+  pool:      { icon: "🏊", label: "プール" },
+  beach:     { icon: "🏖️", label: "ビーチ" },
+  ski:       { icon: "⛷️", label: "スキー" },
+};
+
+// Site display config
+const SITE_CONFIG = {
+  rakuten: { name: "楽天トラベル", color: "#bf0000", bgColor: "#fff0f0", logo: "楽天" },
+  jalan:   { name: "じゃらん",     color: "#e85d00", bgColor: "#fff5f0", logo: "じゃらん" },
+  yahoo:   { name: "Yahoo!トラベル", color: "#720096", bgColor: "#f8f0ff", logo: "Yahoo!" },
+  booking: { name: "Booking.com", color: "#003580", bgColor: "#f0f4ff", logo: "Booking" },
+};
