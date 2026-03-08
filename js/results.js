@@ -14,6 +14,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const children = parseInt(params.get("children") || "0");
   const rooms = parseInt(params.get("rooms") || "1");
 
+  // Inject dynamic SEO meta tags based on search query
+  injectDynamicSEO(query, checkin, checkout, adults, rooms);
+
   // Display search summary
   renderSearchSummary({ query, checkin, checkout, adults, children, rooms });
 
@@ -67,6 +70,60 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+// ────────────────────────────────────────────────
+// Dynamic SEO Meta Injection for Results Page
+// ────────────────────────────────────────────────
+function injectDynamicSEO(query, checkin, checkout, adults, rooms) {
+  const displayQuery = (!query || query.includes(",")) ? "全国" : query;
+  const nights = checkin && checkout ? calcNights(checkin, checkout) : 1;
+  const ci = checkin ? formatJpDate(checkin) : null;
+  const co = checkout ? formatJpDate(checkout) : null;
+
+  // Dynamic title
+  let title = `${displayQuery}のホテル最安値比較`;
+  if (ci && co) title += ` | ${ci}〜${co}（${nights}泊）`;
+  title += ` - トラベル・ラボ`;
+  document.title = title;
+
+  // Dynamic meta description
+  const desc = `${displayQuery}のホテルを楽天トラベル・じゃらん・Yahoo!トラベル・Booking.com・Expedia・Agoda・JTB・るるぶの8社で一括比較。` +
+    (ci ? `${ci}チェックイン・大人${adults || 2}名の` : "") +
+    `最安値プランを瞬時に表示します。`;
+  let metaDesc = document.querySelector('meta[name="description"]');
+  if (!metaDesc) { metaDesc = document.createElement("meta"); metaDesc.name = "description"; document.head.appendChild(metaDesc); }
+  metaDesc.content = desc;
+
+  // Dynamic OG tags
+  let ogTitle = document.querySelector('meta[property="og:title"]');
+  if (!ogTitle) { ogTitle = document.createElement("meta"); ogTitle.setAttribute("property","og:title"); document.head.appendChild(ogTitle); }
+  ogTitle.content = title;
+
+  let ogDesc = document.querySelector('meta[property="og:description"]');
+  if (!ogDesc) { ogDesc = document.createElement("meta"); ogDesc.setAttribute("property","og:description"); document.head.appendChild(ogDesc); }
+  ogDesc.content = desc;
+
+  // Update H1 region if exists (for crawlers that index SPA content)
+  const h1 = document.querySelector("h1.results-h1");
+  if (h1) h1.textContent = `${displayQuery}のホテル一覧`;
+
+  // Inject structured data: ItemList placeholder (updated after results load)
+  const existingLd = document.querySelector('script[data-results-ld]');
+  if (existingLd) existingLd.remove();
+  const ldScript = document.createElement("script");
+  ldScript.type = "application/ld+json";
+  ldScript.setAttribute("data-results-ld", "1");
+  ldScript.textContent = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type":"ListItem","position":1,"name":"ホーム","item":"https://travellab.jp/"},
+      {"@type":"ListItem","position":2,"name":"国内ホテル比較","item":"https://travellab.jp/domestic-hotels.html"},
+      {"@type":"ListItem","position":3,"name":`${displayQuery}のホテル検索結果`}
+    ]
+  });
+  document.head.appendChild(ldScript);
+}
 
 function filterHotelsByQuery(query) {
   if (!query) return HOTELS;
