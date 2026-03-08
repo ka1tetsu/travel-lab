@@ -4,18 +4,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>トラベル・ラボ | 国内・海外ホテル最安値の一括比較サイト</title>
+  <title>ホテル最安値比較【8社一括検索】楽天・じゃらん・Booking.com - トラベル・ラボ</title>
   <meta name="description"
-    content="楽天トラベル・じゃらん・Yahoo!・Booking.comのホテル宿泊料金を一括比較！全国の人気ホテルや旅館の最安値を瞬時に検索し、あなたの旅行を最もお得にする国内最大級の価格比較プラットフォーム。">
-  <meta name="keywords" content="ホテル比較,最安値,旅行,楽天トラベル,じゃらん,Yahoo!トラベル,宿泊,一括検索">
+    content="楽天トラベル・じゃらん・Yahoo!トラベル・Booking.com・Expedia・Agoda・JTB・るるぶの8社を同時比較！東京・京都・大阪・沖縄・北海道など全国のホテル最安値を3秒で検索。会員登録不要・完全無料。">
   <!-- OGP & Twitter -->
-  <meta property="og:title" content="トラベル・ラボ | 国内・海外ホテル最安値一括比較">
-  <meta property="og:description" content="楽天・じゃらん・Yahoo!・Booking.comの宿泊料金を一斉に比較。最安値のホテルがすぐに見つかる！">
+  <meta property="og:title" content="ホテル最安値比較【8社一括検索】楽天・じゃらん・Booking.com - トラベル・ラボ">
+  <meta property="og:description" content="楽天・じゃらん・Yahoo!・Booking.com・Expedia・Agoda・JTB・るるぶを同時比較。最安値のホテルが3秒で見つかる！会員登録不要・完全無料。">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://travellab.example.com/">
-  <meta property="og:image" content="https://travellab.example.com/assets/images/ogp.png">
+  <meta property="og:url" content="https://travellab.jp/">
+  <meta property="og:image" content="https://travellab.jp/assets/images/ogp.png">
+  <meta property="og:site_name" content="トラベル・ラボ">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="canonical" href="https://travellab.example.com/">
+  <meta name="twitter:title" content="ホテル最安値比較【8社一括】- トラベル・ラボ">
+  <meta name="twitter:description" content="楽天・じゃらん・Booking.com等8社を同時比較。会員登録不要・完全無料。">
+  <link rel="canonical" href="https://travellab.jp/">
+  <link rel="sitemap" type="application/xml" href="sitemap.xml">
 
   <!-- Preconnect & Styles -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,17 +26,52 @@
   <link rel="preload" href="css/style.css" as="style">
   <link rel="stylesheet" href="css/style.css">
 
-  <!-- JSON-LD Structured Data for WebSite -->
+  <!-- JSON-LD Structured Data -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "トラベル・ラボ",
-    "url": "https://travellab.example.com/",
+    "alternateName": "Travel Lab",
+    "url": "https://travellab.jp/",
+    "description": "楽天トラベル・じゃらん・Yahoo!トラベル・Booking.com・Expedia・Agoda・JTB・るるぶの8社を同時比較できる国内最大級のホテル価格比較サービス",
     "potentialAction": {
       "@type": "SearchAction",
-      "target": "https://travellab.example.com/results.html?q={search_term_string}",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://travellab.jp/results.html?q={search_term_string}"
+      },
       "query-input": "required name=search_term_string"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "トラベル・ラボ",
+    "url": "https://travellab.jp/",
+    "logo": "https://travellab.jp/assets/images/logo.png",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer support",
+      "url": "https://travellab.jp/contact.html",
+      "availableLanguage": "Japanese"
+    },
+    "sameAs": []
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "ホテル最安値比較【8社一括検索】- トラベル・ラボ",
+    "description": "楽天トラベル・じゃらん・Yahoo!トラベル・Booking.com・Expedia・Agoda・JTB・るるぶの8社を同時比較。全国のホテル最安値を3秒で検索。",
+    "url": "https://travellab.jp/",
+    "inLanguage": "ja",
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [{"@type": "ListItem", "position": 1, "name": "ホーム", "item": "https://travellab.jp/"}]
     }
   }
   </script>
@@ -54,7 +92,7 @@
       </a>
       <nav class="nav-links" aria-label="メインナビゲーション">
         <a href="index.html">ホーム</a>
-        <a href="results.html?q=東京&checkin=2026-03-06&checkout=2026-03-07&adults=2&children=0&rooms=1">ホテル比較</a>
+        <a href="domestic-hotels.html">ホテル比較</a>
         <a href="flights.html">航空券</a>
         <a href="shinkansen.html">新幹線</a>
         <a href="index.html" class="nav-cta">今すぐ検索</a>
@@ -172,6 +210,25 @@
             <button class="quick-dest" data-dest="沖縄">🌺 沖縄</button>
             <button class="quick-dest" data-dest="北海道">❄️ 北海道</button>
             <button class="quick-dest" data-dest="箱根">🗻 箱根</button>
+            <button class="quick-dest" data-dest="福岡">🐟 福岡</button>
+            <button class="quick-dest" data-dest="横浜">⚓ 横浜</button>
+            <button class="quick-dest" data-dest="名古屋">🏯 名古屋</button>
+            <button class="quick-dest" data-dest="仙台">🍡 仙台</button>
+          </div>
+        </div>
+
+        <!-- Area Links for SEO internal linking -->
+        <div style="margin-top: 16px; text-align: center;">
+          <p style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-bottom: 8px;">エリア別ガイド</p>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;">
+            <a href="tokyo-hotels.html" style="color:rgba(255,255,255,0.8); font-size:0.8rem; text-decoration:underline;">東京ホテル比較</a>
+            <a href="kyoto-hotels.html" style="color:rgba(255,255,255,0.8); font-size:0.8rem; text-decoration:underline;">京都ホテル比較</a>
+            <a href="osaka-hotels.html" style="color:rgba(255,255,255,0.8); font-size:0.8rem; text-decoration:underline;">大阪ホテル比較</a>
+            <a href="okinawa-hotels.html" style="color:rgba(255,255,255,0.8); font-size:0.8rem; text-decoration:underline;">沖縄ホテル比較</a>
+            <a href="hokkaido-hotels.html" style="color:rgba(255,255,255,0.8); font-size:0.8rem; text-decoration:underline;">北海道ホテル比較</a>
+            <a href="fukuoka-hotels.html" style="color:rgba(255,255,255,0.8); font-size:0.8rem; text-decoration:underline;">福岡ホテル比較</a>
+            <a href="hakone-hotels.html" style="color:rgba(255,255,255,0.8); font-size:0.8rem; text-decoration:underline;">箱根ホテル比較</a>
+            <a href="yokohama-hotels.html" style="color:rgba(255,255,255,0.8); font-size:0.8rem; text-decoration:underline;">横浜ホテル比較</a>
           </div>
         </div>
       </div>

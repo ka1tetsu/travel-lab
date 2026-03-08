@@ -5,22 +5,161 @@
 const RAKUTEN_APP_ID = "ec65ace1-9e87-4d23-83e4-b54103335b56";
 const RAKUTEN_ACCESS_KEY = "pk_thp8WuFagFNOQh9VnsoWHJ8mAQhhRsHt4NWvW4wUA4q";
 
-// Keyword to Rakuten Area Code Mapping (Simplified Geo-coding)
+// Keyword to Rakuten Area Code Mapping (Full 47-prefecture + major tourist spots)
 const RAKUTEN_AREA_MAPPING = {
-    "東京": { large: "japan", middle: "tokyo", small: "tokyo" },
-    "京都": { large: "japan", middle: "kyoto", small: "kyoto" },
-    "大阪": { large: "japan", middle: "osaka", small: "osaka" },
-    "沖縄": { large: "japan", middle: "okinawa", small: "naha" },
-    "北海道": { large: "japan", middle: "hokkaido", small: "sapporo" },
-    "札幌": { large: "japan", middle: "hokkaido", small: "sapporo" },
-    "函館": { large: "japan", middle: "hokkaido", small: "hakodate" },
-    "福岡": { large: "japan", middle: "fukuoka", small: "fukuoka" },
-    "箱根": { large: "japan", middle: "kanagawa", small: "hakone" },
-    "横浜": { large: "japan", middle: "kanagawa", small: "yokohama" },
-    "軽井沢": { large: "japan", middle: "nagano", small: "karuizawa" },
-    "名古屋": { large: "japan", middle: "aichi", small: "nagoya" },
-    "仙台": { large: "japan", middle: "miyagi", small: "sendai" },
-    "広島": { large: "japan", middle: "hiroshima", small: "hiroshima" },
+    // ── 北海道 ──
+    "北海道":   { large: "japan", middle: "hokkaido", small: "sapporo" },
+    "札幌":     { large: "japan", middle: "hokkaido", small: "sapporo" },
+    "函館":     { large: "japan", middle: "hokkaido", small: "hakodate" },
+    "旭川":     { large: "japan", middle: "hokkaido", small: "asahikawa" },
+    "ニセコ":   { large: "japan", middle: "hokkaido", small: "niseko" },
+    "富良野":   { large: "japan", middle: "hokkaido", small: "furano" },
+    "帯広":     { large: "japan", middle: "hokkaido", small: "obihiro" },
+    "釧路":     { large: "japan", middle: "hokkaido", small: "kushiro" },
+    "小樽":     { large: "japan", middle: "hokkaido", small: "otaru" },
+    "登別":     { large: "japan", middle: "hokkaido", small: "noboribetsu" },
+    "洞爺湖":   { large: "japan", middle: "hokkaido", small: "toyako" },
+    // ── 東北 ──
+    "青森":     { large: "japan", middle: "aomori", small: "aomori" },
+    "弘前":     { large: "japan", middle: "aomori", small: "hirosaki" },
+    "八戸":     { large: "japan", middle: "aomori", small: "hachinohe" },
+    "岩手":     { large: "japan", middle: "iwate", small: "morioka" },
+    "盛岡":     { large: "japan", middle: "iwate", small: "morioka" },
+    "平泉":     { large: "japan", middle: "iwate", small: "hiraizumi" },
+    "宮城":     { large: "japan", middle: "miyagi", small: "sendai" },
+    "仙台":     { large: "japan", middle: "miyagi", small: "sendai" },
+    "松島":     { large: "japan", middle: "miyagi", small: "matsushima" },
+    "秋田":     { large: "japan", middle: "akita", small: "akita" },
+    "乳頭温泉": { large: "japan", middle: "akita", small: "nyuto" },
+    "山形":     { large: "japan", middle: "yamagata", small: "yamagata" },
+    "蔵王":     { large: "japan", middle: "yamagata", small: "zao" },
+    "福島":     { large: "japan", middle: "fukushima", small: "fukushima" },
+    "会津若松": { large: "japan", middle: "fukushima", small: "aizuwakamatsu" },
+    "那須":     { large: "japan", middle: "tochigi", small: "nasu" },
+    // ── 関東 ──
+    "東京":     { large: "japan", middle: "tokyo", small: "tokyo" },
+    "新宿":     { large: "japan", middle: "tokyo", small: "shinjuku" },
+    "渋谷":     { large: "japan", middle: "tokyo", small: "shibuya" },
+    "浅草":     { large: "japan", middle: "tokyo", small: "asakusa" },
+    "銀座":     { large: "japan", middle: "tokyo", small: "ginza" },
+    "秋葉原":   { large: "japan", middle: "tokyo", small: "akihabara" },
+    "品川":     { large: "japan", middle: "tokyo", small: "shinagawa" },
+    "池袋":     { large: "japan", middle: "tokyo", small: "ikebukuro" },
+    "上野":     { large: "japan", middle: "tokyo", small: "ueno" },
+    "お台場":   { large: "japan", middle: "tokyo", small: "odaiba" },
+    "神奈川":   { large: "japan", middle: "kanagawa", small: "yokohama" },
+    "横浜":     { large: "japan", middle: "kanagawa", small: "yokohama" },
+    "みなとみらい": { large: "japan", middle: "kanagawa", small: "yokohama" },
+    "箱根":     { large: "japan", middle: "kanagawa", small: "hakone" },
+    "箱根湯本": { large: "japan", middle: "kanagawa", small: "hakone" },
+    "湯河原":   { large: "japan", middle: "kanagawa", small: "yugawara" },
+    "鎌倉":     { large: "japan", middle: "kanagawa", small: "kamakura" },
+    "埼玉":     { large: "japan", middle: "saitama", small: "saitama" },
+    "川越":     { large: "japan", middle: "saitama", small: "kawagoe" },
+    "千葉":     { large: "japan", middle: "chiba", small: "chiba" },
+    "成田":     { large: "japan", middle: "chiba", small: "narita" },
+    "木更津":   { large: "japan", middle: "chiba", small: "kisarazu" },
+    "茨城":     { large: "japan", middle: "ibaraki", small: "mito" },
+    "水戸":     { large: "japan", middle: "ibaraki", small: "mito" },
+    "栃木":     { large: "japan", middle: "tochigi", small: "utsunomiya" },
+    "日光":     { large: "japan", middle: "tochigi", small: "nikko" },
+    "群馬":     { large: "japan", middle: "gunma", small: "takasaki" },
+    "草津温泉": { large: "japan", middle: "gunma", small: "kusatsu" },
+    "伊香保":   { large: "japan", middle: "gunma", small: "ikaho" },
+    // ── 中部 ──
+    "山梨":     { large: "japan", middle: "yamanashi", small: "kofu" },
+    "富士山":   { large: "japan", middle: "shizuoka", small: "fujisan" },
+    "富士":     { large: "japan", middle: "shizuoka", small: "fujisan" },
+    "河口湖":   { large: "japan", middle: "yamanashi", small: "kawaguchiko" },
+    "長野":     { large: "japan", middle: "nagano", small: "nagano" },
+    "軽井沢":   { large: "japan", middle: "nagano", small: "karuizawa" },
+    "松本":     { large: "japan", middle: "nagano", small: "matsumoto" },
+    "白馬":     { large: "japan", middle: "nagano", small: "hakuba" },
+    "上高地":   { large: "japan", middle: "nagano", small: "kamikochi" },
+    "志賀高原": { large: "japan", middle: "nagano", small: "shigakogen" },
+    "静岡":     { large: "japan", middle: "shizuoka", small: "shizuoka" },
+    "熱海":     { large: "japan", middle: "shizuoka", small: "atami" },
+    "伊豆":     { large: "japan", middle: "shizuoka", small: "izu" },
+    "修善寺":   { large: "japan", middle: "shizuoka", small: "shuzenji" },
+    "愛知":     { large: "japan", middle: "aichi", small: "nagoya" },
+    "名古屋":   { large: "japan", middle: "aichi", small: "nagoya" },
+    "岐阜":     { large: "japan", middle: "gifu", small: "gifu" },
+    "白川郷":   { large: "japan", middle: "gifu", small: "shirakawago" },
+    "新潟":     { large: "japan", middle: "niigata", small: "niigata" },
+    "越後湯沢": { large: "japan", middle: "niigata", small: "yuzawa" },
+    "富山":     { large: "japan", middle: "toyama", small: "toyama" },
+    "石川":     { large: "japan", middle: "ishikawa", small: "kanazawa" },
+    "金沢":     { large: "japan", middle: "ishikawa", small: "kanazawa" },
+    "和倉温泉": { large: "japan", middle: "ishikawa", small: "wakura" },
+    "福井":     { large: "japan", middle: "fukui", small: "fukui" },
+    "東尋坊":   { large: "japan", middle: "fukui", small: "fukui" },
+    // ── 近畿 ──
+    "大阪":     { large: "japan", middle: "osaka", small: "osaka" },
+    "難波":     { large: "japan", middle: "osaka", small: "namba" },
+    "梅田":     { large: "japan", middle: "osaka", small: "umeda" },
+    "USJ":      { large: "japan", middle: "osaka", small: "osaka" },
+    "京都":     { large: "japan", middle: "kyoto", small: "kyoto" },
+    "嵐山":     { large: "japan", middle: "kyoto", small: "kyoto" },
+    "祇園":     { large: "japan", middle: "kyoto", small: "kyoto" },
+    "伏見":     { large: "japan", middle: "kyoto", small: "kyoto" },
+    "兵庫":     { large: "japan", middle: "hyogo", small: "kobe" },
+    "神戸":     { large: "japan", middle: "hyogo", small: "kobe" },
+    "有馬温泉": { large: "japan", middle: "hyogo", small: "arima" },
+    "城崎温泉": { large: "japan", middle: "hyogo", small: "kinosaki" },
+    "奈良":     { large: "japan", middle: "nara", small: "nara" },
+    "吉野":     { large: "japan", middle: "nara", small: "yoshino" },
+    "滋賀":     { large: "japan", middle: "shiga", small: "otsu" },
+    "大津":     { large: "japan", middle: "shiga", small: "otsu" },
+    "比叡山":   { large: "japan", middle: "shiga", small: "otsu" },
+    "和歌山":   { large: "japan", middle: "wakayama", small: "wakayama" },
+    "白浜":     { large: "japan", middle: "wakayama", small: "shirahama" },
+    "熊野":     { large: "japan", middle: "wakayama", small: "kumano" },
+    "三重":     { large: "japan", middle: "mie", small: "ise" },
+    "伊勢":     { large: "japan", middle: "mie", small: "ise" },
+    "鳥羽":     { large: "japan", middle: "mie", small: "toba" },
+    // ── 中国 ──
+    "広島":     { large: "japan", middle: "hiroshima", small: "hiroshima" },
+    "宮島":     { large: "japan", middle: "hiroshima", small: "miyajima" },
+    "岡山":     { large: "japan", middle: "okayama", small: "okayama" },
+    "倉敷":     { large: "japan", middle: "okayama", small: "kurashiki" },
+    "鳥取":     { large: "japan", middle: "tottori", small: "tottori" },
+    "島根":     { large: "japan", middle: "shimane", small: "matsue" },
+    "出雲":     { large: "japan", middle: "shimane", small: "izumo" },
+    "山口":     { large: "japan", middle: "yamaguchi", small: "yamaguchi" },
+    "萩":       { large: "japan", middle: "yamaguchi", small: "hagi" },
+    // ── 四国 ──
+    "徳島":     { large: "japan", middle: "tokushima", small: "tokushima" },
+    "香川":     { large: "japan", middle: "kagawa", small: "takamatsu" },
+    "高松":     { large: "japan", middle: "kagawa", small: "takamatsu" },
+    "愛媛":     { large: "japan", middle: "ehime", small: "matsuyama" },
+    "道後温泉": { large: "japan", middle: "ehime", small: "dogo" },
+    "高知":     { large: "japan", middle: "kochi", small: "kochi" },
+    // ── 九州 ──
+    "福岡":     { large: "japan", middle: "fukuoka", small: "fukuoka" },
+    "博多":     { large: "japan", middle: "fukuoka", small: "fukuoka" },
+    "天神":     { large: "japan", middle: "fukuoka", small: "fukuoka" },
+    "糸島":     { large: "japan", middle: "fukuoka", small: "itoshima" },
+    "佐賀":     { large: "japan", middle: "saga", small: "saga" },
+    "嬉野温泉": { large: "japan", middle: "saga", small: "ureshino" },
+    "長崎":     { large: "japan", middle: "nagasaki", small: "nagasaki" },
+    "ハウステンボス": { large: "japan", middle: "nagasaki", small: "huis" },
+    "熊本":     { large: "japan", middle: "kumamoto", small: "kumamoto" },
+    "阿蘇":     { large: "japan", middle: "kumamoto", small: "aso" },
+    "大分":     { large: "japan", middle: "oita", small: "beppu" },
+    "別府":     { large: "japan", middle: "oita", small: "beppu" },
+    "由布院":   { large: "japan", middle: "oita", small: "yufuin" },
+    "宮崎":     { large: "japan", middle: "miyazaki", small: "miyazaki" },
+    "鹿児島":   { large: "japan", middle: "kagoshima", small: "kagoshima" },
+    "指宿":     { large: "japan", middle: "kagoshima", small: "ibusuki" },
+    "屋久島":   { large: "japan", middle: "kagoshima", small: "yakushima" },
+    // ── 沖縄 ──
+    "沖縄":     { large: "japan", middle: "okinawa", small: "naha" },
+    "那覇":     { large: "japan", middle: "okinawa", small: "naha" },
+    "恩納村":   { large: "japan", middle: "okinawa", small: "onna" },
+    "石垣島":   { large: "japan", middle: "okinawa", small: "ishigaki" },
+    "宮古島":   { large: "japan", middle: "okinawa", small: "miyako" },
+    "本部":     { large: "japan", middle: "okinawa", small: "motobu" },
+    "名護":     { large: "japan", middle: "okinawa", small: "nago" },
     // 該当なしの場合のフォールバック
     "default": { large: "japan", middle: "tokyo", small: "tokyo" }
 };
@@ -87,7 +226,24 @@ async function fetchHotelsArray(url) {
 }
 
 /**
- * 楽天APIからホテル情報を取得する（堅牢な5段階フォールバック検索）
+ * RAKUTEN_AREA_MAPPINGから最もマッチするエリアキーを検索する
+ * 長いキーワードを優先（例: "箱根湯本" > "箱根"）
+ */
+function findAreaMapping(query) {
+    if (!query) return null;
+    // 完全一致を優先
+    if (RAKUTEN_AREA_MAPPING[query]) return RAKUTEN_AREA_MAPPING[query];
+    // 長さ降順でキーをソートして最長一致を探す
+    const keys = Object.keys(RAKUTEN_AREA_MAPPING).filter(k => k !== "default");
+    keys.sort((a, b) => b.length - a.length);
+    for (const key of keys) {
+        if (query.includes(key)) return RAKUTEN_AREA_MAPPING[key];
+    }
+    return null;
+}
+
+/**
+ * 楽天APIからホテル情報を取得する（堅牢な6段階フォールバック検索）
  * @param {string} rawQuery ユーザー入力の生の検索文字列
  * @param {string} checkin チェックイン日 (YYYY-MM-DD)
  * @param {string} checkout チェックアウト日 (YYYY-MM-DD)
@@ -96,19 +252,36 @@ async function fetchHotelsArray(url) {
 async function fetchRakutenHotels(rawQuery, checkin, checkout) {
     if (!rawQuery) rawQuery = "東京"; // Default searching
 
-    const baseVacantUrl = `https://openapi.rakuten.co.jp/engine/api/Travel/VacantHotelSearch/20170426?format=json&applicationId=${RAKUTEN_APP_ID}&accessKey=${RAKUTEN_ACCESS_KEY}&searchRadius=3`;
-    const baseKeywordUrl = `https://openapi.rakuten.co.jp/engine/api/Travel/KeywordHotelSearch/20170426?format=json&applicationId=${RAKUTEN_APP_ID}&accessKey=${RAKUTEN_ACCESS_KEY}`;
+    const baseVacantUrl = `https://app.rakuten.co.jp/services/api/Travel/VacantHotelSearch/20170426?format=json&applicationId=${RAKUTEN_APP_ID}&searchRadius=3`;
+    const baseHotelUrl  = `https://app.rakuten.co.jp/services/api/Travel/HotelSearch/20170426?format=json&applicationId=${RAKUTEN_APP_ID}`;
+    const baseKeywordUrl = `https://app.rakuten.co.jp/services/api/Travel/KeywordHotelSearch/20170426?format=json&applicationId=${RAKUTEN_APP_ID}`;
 
     // VacantHotelSearchは日付パラメータが必須
     const dateParams = (checkin && checkout) ? `&checkinDate=${checkin}&checkoutDate=${checkout}` : "";
 
     let hotels = [];
 
+    // --- Phase 0: RAKUTEN_AREA_MAPPINGの直接マッチング（最優先・最高速） ---
+    // 入力がエリアマッピングに存在する場合、エリアコードで直接検索
+    const areaMap = findAreaMapping(rawQuery);
+    if (areaMap) {
+        const areaParams = `&largeClassCode=${areaMap.large}&middleClassCode=${areaMap.middle}&smallClassCode=${areaMap.small}`;
+        if (dateParams) {
+            console.log(`[Phase 0] Area Vacant Search: ${areaMap.middle}/${areaMap.small}`);
+            hotels = await fetchHotelsArray(`${baseVacantUrl}${areaParams}${dateParams}&datumType=1`);
+            if (hotels.length > 0) return hotels;
+        }
+        // 日付なし or 空室なしの場合はHotelSearchでエリア検索
+        console.log(`[Phase 0b] Area Hotel Search: ${areaMap.middle}/${areaMap.small}`);
+        hotels = await fetchHotelsArray(`${baseHotelUrl}${areaParams}`);
+        if (hotels.length > 0) return hotels;
+    }
+
     // --- Phase 1: 直座標指定（現在地ボタン使用時） ---
     if (rawQuery.includes(",")) {
         const [lat, lng] = rawQuery.replace(/\s/g, "").split(",");
         if (!isNaN(parseFloat(lat)) && !isNaN(parseFloat(lng)) && dateParams) {
-            hotels = await fetchHotelsArray(`${baseVacantUrl}&latitude=${lat}&longitude=${lng}${dateParams}`);
+            hotels = await fetchHotelsArray(`${baseVacantUrl}&latitude=${lat}&longitude=${lng}${dateParams}&datumType=1`);
             if (hotels.length > 0) return hotels;
         }
     }
@@ -121,11 +294,11 @@ async function fetchRakutenHotels(rawQuery, checkin, checkout) {
     const geo = await getWikiCoordinates(searchWord);
     if (geo && dateParams) {
         console.log(`[Phase 2] Wiki GeoSearch Lat: ${geo.lat}, Lng: ${geo.lng} for ${searchWord}`);
-        hotels = await fetchHotelsArray(`${baseVacantUrl}&latitude=${geo.lat}&longitude=${geo.lng}${dateParams}`);
+        hotels = await fetchHotelsArray(`${baseVacantUrl}&latitude=${geo.lat}&longitude=${geo.lng}${dateParams}&datumType=1`);
         if (hotels.length > 0) return hotels;
     }
 
-    // --- Phase 3: 楽天APIの完全一致キーワード検索 ---
+    // --- Phase 3: 楽天APIのキーワード検索（cleanedWordで） ---
     console.log(`[Phase 3] Keyword Search: ${searchWord}`);
     hotels = await fetchHotelsArray(`${baseKeywordUrl}&keyword=${encodeURIComponent(searchWord)}`);
     if (hotels.length > 0) return hotels;
@@ -139,12 +312,14 @@ async function fetchRakutenHotels(rawQuery, checkin, checkout) {
         if (hotels.length > 0) return hotels;
     }
 
-    // --- Phase 5: 最終フォールバック（入力に含まれる都道府県・主要都市レベルでの検索） ---
-    const majorAreas = ["北海道", "青森", "岩手", "宮城", "秋田", "山形", "福島", "茨城", "栃木", "群馬", "埼玉", "千葉", "東京", "神奈川", "箱根", "新潟", "富山", "石川", "福井", "山梨", "長野", "軽井沢", "岐阜", "静岡", "愛知", "名古屋", "三重", "滋賀", "京都", "大阪", "兵庫", "神戸", "奈良", "和歌山", "鳥取", "島根", "岡山", "広島", "山口", "徳島", "香川", "愛媛", "高知", "福岡", "佐賀", "長崎", "熊本", "大分", "宮崎", "鹿児島", "沖縄"];
-    for (const area of majorAreas) {
-        if (rawQuery.includes(area) || rawQuery.includes(area.replace(/(都|道|府|県)$/, ''))) {
-            console.log(`[Phase 5] Area Fallback: ${area}`);
-            hotels = await fetchHotelsArray(`${baseKeywordUrl}&keyword=${encodeURIComponent(area)}`);
+    // --- Phase 5: 最終フォールバック（RAKUTEN_AREA_MAPPINGの全キーと照合） ---
+    const areaKeys = Object.keys(RAKUTEN_AREA_MAPPING).filter(k => k !== "default");
+    areaKeys.sort((a, b) => b.length - a.length); // 長いキーを優先
+    for (const key of areaKeys) {
+        if (rawQuery.includes(key)) {
+            const m = RAKUTEN_AREA_MAPPING[key];
+            console.log(`[Phase 5] Area Fallback via Mapping: ${key}`);
+            hotels = await fetchHotelsArray(`${baseHotelUrl}&largeClassCode=${m.large}&middleClassCode=${m.middle}&smallClassCode=${m.small}`);
             if (hotels.length > 0) return hotels;
         }
     }
